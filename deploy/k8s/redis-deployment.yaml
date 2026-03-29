@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: agentforge-redis
+  namespace: agentforge
+  labels:
+    app: agentforge-redis
+    app.kubernetes.io/name: agentforge-redis
+    app.kubernetes.io/component: cache
+    app.kubernetes.io/part-of: agentforge
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: agentforge-redis
+  template:
+    metadata:
+      labels:
+        app: agentforge-redis
+    spec:
+      containers:
+        - name: redis
+          image: redis:7-alpine
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 6379
+              protocol: TCP
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "200m"
+          readinessProbe:
+            exec:
+              command:
+                - redis-cli
+                - ping
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            exec:
+              command:
+                - redis-cli
+                - ping
+            initialDelaySeconds: 15
+            periodSeconds: 15

@@ -1,0 +1,45 @@
+# AgentForge Backend Dependencies
+
+# Web Framework
+fastapi>=0.109.0
+uvicorn[standard]>=0.27.0
+
+# LLM Integration
+litellm>=1.20.0
+
+# Vector Database
+chromadb>=0.4.22
+
+# Database
+sqlalchemy[asyncio]>=2.0.25
+asyncpg>=0.29.0
+
+# Data Validation
+pydantic>=2.5.0
+pydantic-settings>=2.1.0
+
+# Cache
+redis>=5.0.0
+
+# Configuration
+python-dotenv>=1.0.0
+pyyaml>=6.0.1
+
+# HTTP Client
+httpx>=0.26.0
+
+# Web Scraping
+beautifulsoup4>=4.12.0
+
+# Data Processing
+pandas>=2.2.0
+matplotlib>=3.8.0
+
+# File Handling
+aiofiles>=23.2.0
+
+# Authentication
+python-jose[cryptography]>=3.3.0
+passlib[bcrypt]>=1.7.4
+python-multipart>=0.0.6
+cryptography>=42.0.0

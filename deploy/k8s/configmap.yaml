@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: agentforge-config
+  namespace: agentforge
+  labels:
+    app.kubernetes.io/name: agentforge-config
+    app.kubernetes.io/part-of: agentforge
+data:
+  APP_ENV: "production"
+  APP_DEBUG: "false"
+  DEFAULT_LANGUAGE: "zh-CN"
+  LOG_LEVEL: "INFO"
+  CHROMA_HOST: "agentforge-chroma"
+  CHROMA_PORT: "8000"
+  CORS_ORIGINS: "*"
+  MAX_UPLOAD_SIZE: "52428800"

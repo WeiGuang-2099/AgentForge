@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: agentforge-web
+  namespace: agentforge
+  labels:
+    app: agentforge-web
+    app.kubernetes.io/name: agentforge-web
+    app.kubernetes.io/component: web
+    app.kubernetes.io/part-of: agentforge
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: agentforge-web
+  template:
+    metadata:
+      labels:
+        app: agentforge-web
+    spec:
+      containers:
+        - name: web
+          image: ghcr.io/agentforge/web:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3000
+              protocol: TCP
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            initialDelaySeconds: 30
+            periodSeconds: 15
+            timeoutSeconds: 5
+          env:
+            - name: NEXT_PUBLIC_API_URL
+              value: "http://agentforge-api:8000"
