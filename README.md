@@ -214,7 +214,7 @@
 
 ```bash
 # 1. Clone项目
-git clone https://github.com/your-username/agentforge.git
+git clone https://github.com/WeiGuang-2099/AgentForge.git
 cd agentforge
 
 # 2. 配置API Key
@@ -786,44 +786,44 @@ agentforge/
 ### Phase 1: 核心基础 (v0.1.0)
 
 - [x] 项目结构搭建
-- [ ] 核心Agent引擎
-- [ ] LLM集成（LiteLLM）
-- [ ] 基础CLI工具
-- [ ] 3个预置Agent
+- [x] 核心Agent引擎
+- [x] LLM集成（LiteLLM）
+- [x] 基础CLI工具
+- [x] 3个预置Agent
 
 ### Phase 2: Web界面 (v0.2.0)
 
-- [ ] Next.js前端框架
-- [ ] 实时对话界面
-- [ ] Agent选择器
-- [ ] 流式响应显示
+- [x] Next.js前端框架
+- [x] 实时对话界面
+- [x] Agent选择器
+- [x] 流式响应显示
 
 ### Phase 3: 工具生态 (v0.3.0)
 
-- [ ] 工具注册系统
-- [ ] 代码执行沙箱
-- [ ] 网络搜索工具
-- [ ] 文件操作工具
+- [x] 工具注册系统
+- [x] 代码执行沙箱
+- [x] 网络搜索工具
+- [x] 文件操作工具
 
 ### Phase 4: 多Agent协作 (v0.4.0)
 
-- [ ] 多Agent通信协议
-- [ ] 工作流引擎
-- [ ] 团队协作模板
-- [ ] 可视化编排器
+- [x] 多Agent通信协议
+- [x] 工作流引擎
+- [x] 团队协作模板
+- [x] 可视化编排器
 
 ### Phase 5: 企业级功能 (v0.5.0)
 
-- [ ] 用户认证系统
-- [ ] API Key管理
-- [ ] 使用量统计
-- [ ] 审计日志
+- [x] 用户认证系统
+- [x] API Key管理
+- [x] 使用量统计
+- [x] 审计日志
 
 ### Phase 6: 生态扩展 (v1.0.0)
 
-- [ ] 插件系统
-- [ ] 模板市场
-- [ ] 云端部署方案
+- [x] 插件系统
+- [x] 模板市场
+- [x] 云端部署方案
 - [ ] 移动端适配
 
 ---
@@ -844,7 +844,7 @@ agentforge/
 
 ```bash
 # 1. Fork并Clone
-git clone https://github.com/your-username/agentforge.git
+git clone https://github.com/WeiGuang-2099/AgentForge.git
 
 # 2. 创建分支
 git checkout -b feature/your-feature
