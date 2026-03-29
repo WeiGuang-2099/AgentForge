@@ -13,7 +13,15 @@ class Settings(BaseSettings):
     ANTHROPIC_MODEL: str = "claude-3-opus-20240229"
     GOOGLE_API_KEY: Optional[str] = None
     ZHIPUAI_API_KEY: Optional[str] = None  # 智谱 AI API Key
+    DEEPSEEK_API_KEY: Optional[str] = None  # DeepSeek API Key
+    MOONSHOT_API_KEY: Optional[str] = None  # Moonshot API Key
+    
+    # 自定义 API 端点
     OPENAI_API_BASE: Optional[str] = None
+    ANTHROPIC_API_BASE: Optional[str] = None
+    ZHIPUAI_API_BASE: Optional[str] = None
+    DEEPSEEK_API_BASE: Optional[str] = None
+    MOONSHOT_API_BASE: Optional[str] = None
     
     # 应用配置
     APP_ENV: str = "development"

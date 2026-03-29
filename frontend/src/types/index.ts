@@ -87,6 +87,17 @@ export interface AppSettings {
     openai?: string;
     anthropic?: string;
     google?: string;
+    zhipuai?: string;
+    deepseek?: string;
+    moonshot?: string;
+  };
+  apiEndpoints: {
+    openai?: string;
+    anthropic?: string;
+    google?: string;
+    zhipuai?: string;
+    deepseek?: string;
+    moonshot?: string;
   };
   defaultModel: string;
   theme: "light" | "dark" | "system";

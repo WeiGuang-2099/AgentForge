@@ -118,7 +118,7 @@ class LLMClient:
             if settings.GOOGLE_API_KEY:
                 call_kwargs["api_key"] = settings.GOOGLE_API_KEY
         elif model.startswith("zhipuai/") or "glm" in model.lower():
-            # 智谱 AI 模型，LiteLLM 会自动读取 ZHIPUAI_API_KEY 环境变量
+            # 智谱 AI 模型（原生格式或 OpenAI 兼容模式）
             if settings.ZHIPUAI_API_KEY:
                 call_kwargs["api_key"] = settings.ZHIPUAI_API_KEY
         else:

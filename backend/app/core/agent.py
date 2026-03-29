@@ -28,6 +28,7 @@ class AgentProfile:
     memory: Optional[dict] = None
     parameters: dict = field(default_factory=lambda: {"temperature": 0.7, "max_tokens": 2000})
     is_preset: bool = False
+    api_base: Optional[str] = None  # 自定义 API 端点（如智谱等）
 
 
 class AgentNotFoundError(Exception):
@@ -139,6 +140,7 @@ class AgentRegistry:
             memory=data.get('memory'),
             parameters=data.get('parameters', {"temperature": 0.7, "max_tokens": 2000}),
             is_preset=True,
+            api_base=data.get('api_base'),  # 支持自定义 API 端点
         )
 
 
@@ -163,21 +165,23 @@ class AgentEngine:
         count = self.registry.load_presets(presets_dir)
         logger.info(f"已加载 {count} 个预置 Agent")
     
-    def _get_llm_client(self, model: str, parameters: dict = None) -> LLMClient:
+    def _get_llm_client(self, model: str, api_base: str = None, parameters: dict = None) -> LLMClient:
         """
-        获取或创建 LLM 客户端（按模型缓存）。
+        获取或创建 LLM 客户端（按模型+api_base缓存）。
         
         Args:
             model: 模型名称
+            api_base: 自定义 API 端点
             parameters: 参数（目前未使用，LLMClient 使用调用时传入的参数）
             
         Returns:
             LLMClient 实例
         """
-        if model not in self._llm_clients:
-            self._llm_clients[model] = LLMClient(model=model)
-            logger.debug(f"创建新的 LLMClient: {model}")
-        return self._llm_clients[model]
+        cache_key = f"{model}:{api_base or 'default'}"
+        if cache_key not in self._llm_clients:
+            self._llm_clients[cache_key] = LLMClient(model=model, api_base=api_base)
+            logger.debug(f"创建新的 LLMClient: {model} (api_base: {api_base})")
+        return self._llm_clients[cache_key]
     
     def _build_messages(
         self, 
@@ -250,7 +254,7 @@ class AgentEngine:
         if not profile:
             raise AgentNotFoundError(f"Agent '{agent_name}' 未找到")
         
-        llm_client = self._get_llm_client(profile.model, profile.parameters)
+        llm_client = self._get_llm_client(profile.model, profile.api_base, profile.parameters)
         full_messages = self._build_messages(profile, messages)
         
         # 合并 profile.parameters 和 kwargs，kwargs 优先
@@ -328,7 +332,7 @@ class AgentEngine:
             return
         
         # 无工具的 Agent，正常流式
-        llm_client = self._get_llm_client(profile.model, profile.parameters)
+        llm_client = self._get_llm_client(profile.model, profile.api_base, profile.parameters)
         full_messages = self._build_messages(profile, messages)
         
         # 合并 profile.parameters 和 kwargs，kwargs 优先
