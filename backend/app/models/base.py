@@ -2,9 +2,8 @@
 from datetime import datetime
 from uuid import uuid4
 
-from sqlalchemy import DateTime, func
+from sqlalchemy import DateTime, String, func
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
-from sqlalchemy.dialects.postgresql import UUID
 
 
 class Base(DeclarativeBase):
@@ -13,9 +12,9 @@ class Base(DeclarativeBase):
 
 
 class UUIDMixin:
-    """Mixin that provides UUID primary key."""
+    """Mixin that provides UUID primary key (stored as String for portability)."""
     id: Mapped[str] = mapped_column(
-        UUID(as_uuid=False),
+        String(36),
         primary_key=True,
         default=lambda: str(uuid4())
     )
