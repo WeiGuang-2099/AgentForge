@@ -69,6 +69,40 @@ export const workflowApi = {
   list: () => apiClient.get<WorkflowInfo[]>("/workflows").then((r) => r.data),
 };
 
+/** Conversation API */
+export interface ConversationInfo {
+  id: string;
+  agent_name: string;
+  title: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface MessageInfo {
+  id: string;
+  role: string;
+  content: string;
+  created_at: string;
+}
+
+export const conversationApi = {
+  list: (agentName?: string) => {
+    const params = new URLSearchParams();
+    if (agentName) params.set("agent_name", agentName);
+    return apiClient
+      .get<ConversationInfo[]>(`/conversations?${params.toString()}`)
+      .then((r) => r.data);
+  },
+  getMessages: (conversationId: string) =>
+    apiClient
+      .get<MessageInfo[]>(`/conversations/${conversationId}/messages`)
+      .then((r) => r.data),
+  delete: (conversationId: string) =>
+    apiClient
+      .delete(`/conversations/${conversationId}`)
+      .then((r) => r.data),
+};
+
 /** 流式执行工作流 */
 export async function* streamWorkflow(
   workflowName: string,
