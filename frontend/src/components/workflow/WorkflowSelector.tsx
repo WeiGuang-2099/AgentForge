@@ -57,10 +57,10 @@ export function WorkflowSelector({ onSelect }: WorkflowSelectorProps) {
           </svg>
         </div>
         <p className="text-gray-500 dark:text-gray-400 text-center">
-          暂无可用工作流
+          No workflows available
         </p>
         <p className="text-sm text-gray-400 dark:text-gray-500 text-center mt-1">
-          请在 presets/team 目录中添加工作流配置
+          Add workflow configurations in the presets/team directory
         </p>
       </div>
     );
@@ -70,10 +70,10 @@ export function WorkflowSelector({ onSelect }: WorkflowSelectorProps) {
     <div className="p-6">
       <div className="mb-6">
         <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
-          选择工作流
+          Select a Workflow
         </h2>
         <p className="text-gray-500 dark:text-gray-400 mt-1">
-          选择一个预定义的工作流来执行多 Agent 协作任务
+          Select a predefined workflow for multi-agent collaboration
         </p>
       </div>
 
@@ -132,7 +132,7 @@ export function WorkflowSelector({ onSelect }: WorkflowSelectorProps) {
                     d="M13 10V3L4 14h7v7l9-11h-7z"
                   />
                 </svg>
-                {workflow.steps.length} 个步骤
+                {workflow.steps.length} steps
               </span>
               <span className="flex items-center gap-1">
                 <svg
@@ -148,7 +148,7 @@ export function WorkflowSelector({ onSelect }: WorkflowSelectorProps) {
                     d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
                   />
                 </svg>
-                {new Set(workflow.steps.map((s) => s.agent)).size} 个 Agent
+                {new Set(workflow.steps.map((s) => s.agent)).size} agents
               </span>
             </div>
 

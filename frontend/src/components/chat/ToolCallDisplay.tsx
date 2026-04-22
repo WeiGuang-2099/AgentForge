@@ -127,7 +127,7 @@ function ResultContent({ result, toolName }: { result: string; toolName: string 
         {parsedResult.map((item: { title?: string; snippet?: string; url?: string }, index: number) => (
           <li key={index} className="text-sm">
             <div className="font-medium text-gray-800 dark:text-gray-200">
-              {index + 1}. {item.title || "无标题"}
+              {index + 1}. {item.title || "No title"}
             </div>
             <p className="text-gray-600 dark:text-gray-400 text-xs mt-0.5 line-clamp-2">
               {item.snippet || item.url || ""}
@@ -217,13 +217,13 @@ export function ToolCallDisplay({ toolCall }: ToolCallDisplayProps) {
         {/* 调用中状态 */}
         {status === "calling" && (
           <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
-            <span>正在调用 {name}...</span>
+            <span>Calling {name}...</span>
           </div>
         )}
 
         {/* 参数展示 */}
         {args && Object.keys(args).length > 0 && (
-          <CollapsibleSection title="参数" defaultOpen={false}>
+          <CollapsibleSection title="Parameters" defaultOpen={false}>
             <pre
               className={cn(
                 "p-2 rounded text-xs font-mono",
@@ -239,7 +239,7 @@ export function ToolCallDisplay({ toolCall }: ToolCallDisplayProps) {
 
         {/* 结果展示 */}
         {result && (
-          <CollapsibleSection title="结果" defaultOpen={true}>
+          <CollapsibleSection title="Result" defaultOpen={true}>
             <ResultContent result={result} toolName={name} />
           </CollapsibleSection>
         )}
@@ -254,7 +254,7 @@ export function ToolCallDisplay({ toolCall }: ToolCallDisplayProps) {
               "text-sm"
             )}
           >
-            <span className="font-medium">错误：</span>
+            <span className="font-medium">Error: </span>
             {result}
           </div>
         )}

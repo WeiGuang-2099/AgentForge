@@ -28,7 +28,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
     const conversation: Conversation = {
       id,
       agent_name: agentName,
-      title: "新对话",
+      title: "New Conversation",
       messages: [],
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),

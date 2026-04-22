@@ -30,32 +30,32 @@ plugin_manager = PluginManager()
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """应用生命周期管理"""
-    logger.info("AgentForge API 启动中...")
+    logger.info("AgentForge API starting...")
     # 注册所有工具
     register_all_tools()
-    logger.info("已注册所有工具")
+    logger.info("All tools registered")
     # 初始化 Agent 引擎（加载预置模板）
     await engine.initialize()
-    logger.info(f"已加载 {len(engine.list_agents())} 个 Agent")
+    logger.info(f"Loaded {len(engine.list_agents())} agents")
     # 加载团队工作流预设
     presets_dir = os.path.join(os.path.dirname(__file__), "..", "..", "presets")
     wf_count = workflow_engine.load_team_presets(os.path.normpath(presets_dir))
-    logger.info(f"已加载 {wf_count} 个团队工作流")
+    logger.info(f"Loaded {wf_count} team workflows")
     # 发现并激活插件
     plugin_count = plugin_manager.discover_plugins()
     active_count = await plugin_manager.activate_all()
-    logger.info(f"已发现 {plugin_count} 个插件，已激活 {active_count} 个")
+    logger.info(f"Discovered {plugin_count} plugins, activated {active_count}")
     # 初始化数据库表
     await init_db()
-    logger.info("数据库已初始化")
+    logger.info("Database initialized")
     yield
     # 关闭数据库连接
     await close_db()
-    logger.info("AgentForge API 关闭")
+    logger.info("AgentForge API shutting down")
 
 app = FastAPI(
     title="AgentForge API",
-    description="开箱即用的多Agent协作框架",
+    description="Ready-to-use multi-agent collaboration framework",
     version="0.1.0",
     lifespan=lifespan,
 )

@@ -90,23 +90,23 @@ async def export_template(name: str):
                     if data and data.get("name") == name:
                         return TemplateExportResponse(name=name, yaml_content=content)
     
-    raise HTTPException(status_code=404, detail=f"模板 '{name}' 未找到")
+    raise HTTPException(status_code=404, detail=f"Template '{name}' not found")
 
 
 @router.post("/marketplace/templates/import")
 async def import_template(file: UploadFile = File(...)):
     """导入模板 YAML 文件"""
     if not file.filename.endswith((".yaml", ".yml")):
-        raise HTTPException(status_code=400, detail="仅支持 YAML 文件")
+        raise HTTPException(status_code=400, detail="Only YAML files are supported")
     
     content = await file.read()
     try:
         data = yaml.safe_load(content.decode("utf-8"))
     except:
-        raise HTTPException(status_code=400, detail="无效的 YAML 格式")
+        raise HTTPException(status_code=400, detail="Invalid YAML format")
     
     if not data or "name" not in data:
-        raise HTTPException(status_code=400, detail="模板必须包含 name 字段")
+        raise HTTPException(status_code=400, detail="Template must contain a 'name' field")
     
     # 保存到 presets 目录
     presets_dir = os.path.normpath(PRESETS_DIR)
@@ -120,4 +120,4 @@ async def import_template(file: UploadFile = File(...)):
     with open(filepath, "wb") as f:
         f.write(content)
     
-    return {"message": f"模板 '{data['name']}' 导入成功", "name": data["name"]}
+    return {"message": f"Template '{data['name']}' imported successfully", "name": data["name"]}

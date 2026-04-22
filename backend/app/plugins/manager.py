@@ -55,7 +55,7 @@ class PluginManager:
         """
         if not os.path.isdir(self.plugins_dir):
             os.makedirs(self.plugins_dir, exist_ok=True)
-            logger.info(f"已创建插件目录: {self.plugins_dir}")
+            logger.info(f"Created plugins directory: {self.plugins_dir}")
             return 0
         
         count = 0
@@ -72,9 +72,9 @@ class PluginManager:
                     info = PluginInfo(metadata=plugin.metadata, plugin=plugin)
                     self._plugins[plugin.metadata.name] = info
                     count += 1
-                    logger.info(f"发现插件: {plugin.metadata.name} v{plugin.metadata.version}")
+                    logger.info(f"Discovered plugin: {plugin.metadata.name} v{plugin.metadata.version}")
             except Exception as e:
-                logger.warning(f"加载插件 '{entry}' 失败: {e}")
+                logger.warning(f"Failed to load plugin '{entry}': {e}")
         
         return count
     
@@ -92,7 +92,7 @@ class PluginManager:
         # 查找 Plugin 类
         plugin_class = getattr(module, "Plugin", None)
         if not plugin_class or not issubclass(plugin_class, BasePlugin):
-            logger.warning(f"插件 '{module_name}' 未找到有效的 Plugin 类")
+            logger.warning(f"Plugin '{module_name}' has no valid Plugin class")
             return None
         
         return plugin_class()
@@ -101,7 +101,7 @@ class PluginManager:
         """激活插件"""
         info = self._plugins.get(name)
         if not info:
-            logger.warning(f"插件 '{name}' 未找到")
+            logger.warning(f"Plugin '{name}' not found")
             return False
         
         if info.is_active:
@@ -110,10 +110,10 @@ class PluginManager:
         try:
             await info.plugin.activate()
             info.is_active = True
-            logger.info(f"插件 '{name}' 已激活")
+            logger.info(f"Plugin '{name}' activated")
             return True
         except Exception as e:
-            logger.error(f"激活插件 '{name}' 失败: {e}")
+            logger.error(f"Failed to activate plugin '{name}': {e}")
             return False
     
     async def deactivate_plugin(self, name: str) -> bool:
@@ -125,10 +125,10 @@ class PluginManager:
         try:
             await info.plugin.deactivate()
             info.is_active = False
-            logger.info(f"插件 '{name}' 已停用")
+            logger.info(f"Plugin '{name}' deactivated")
             return True
         except Exception as e:
-            logger.error(f"停用插件 '{name}' 失败: {e}")
+            logger.error(f"Failed to deactivate plugin '{name}': {e}")
             return False
     
     async def activate_all(self) -> int:

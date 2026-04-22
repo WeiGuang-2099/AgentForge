@@ -45,7 +45,7 @@ function CodeBlock({
               : "text-gray-400 hover:text-gray-200"
           )}
         >
-          {copied ? "已复制 ✓" : "复制"}
+          {copied ? "Copied" : "Copy"}
         </button>
       </div>
       {/* 代码内容 */}

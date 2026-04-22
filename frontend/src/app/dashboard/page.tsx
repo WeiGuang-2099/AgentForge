@@ -40,14 +40,14 @@ export default function DashboardPage() {
         ]);
 
         if (!summaryRes.ok || !agentRes.ok || !modelRes.ok) {
-          throw new Error("获取数据失败");
+          throw new Error("Failed to fetch data");
         }
 
         setSummary(await summaryRes.json());
         setByAgent(await agentRes.json());
         setByModel(await modelRes.json());
       } catch (err) {
-        setError(err instanceof Error ? err.message : "未知错误");
+        setError(err instanceof Error ? err.message : "Unknown error");
       } finally {
         setLoading(false);
       }
@@ -84,10 +84,10 @@ export default function DashboardPage() {
                   d="M10 19l-7-7m0 0l7-7m-7 7h18"
                 />
               </svg>
-              <span>返回首页</span>
+              <span>Back to Home</span>
             </Link>
             <h1 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-              使用量仪表板
+              Usage Dashboard
             </h1>
             <div className="w-24" />
           </div>
@@ -131,7 +131,7 @@ export default function DashboardPage() {
                   </div>
                   <div>
                     <p className="text-sm text-gray-500 dark:text-gray-400">
-                      总请求数
+                      Total Requests
                     </p>
                     <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                       {summary?.total_requests.toLocaleString() ?? 0}
@@ -160,7 +160,7 @@ export default function DashboardPage() {
                   </div>
                   <div>
                     <p className="text-sm text-gray-500 dark:text-gray-400">
-                      总 Token 数
+                      Total Tokens
                     </p>
                     <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                       {summary?.total_tokens.toLocaleString() ?? 0}
@@ -189,7 +189,7 @@ export default function DashboardPage() {
                   </div>
                   <div>
                     <p className="text-sm text-gray-500 dark:text-gray-400">
-                      平均每请求 Token
+                      Avg Tokens per Request
                     </p>
                     <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                       {avgTokensPerRequest.toLocaleString()}
@@ -203,16 +203,16 @@ export default function DashboardPage() {
             <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 mb-8">
               <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-800">
                 <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                  按 Agent 使用量
+                  Usage by Agent
                 </h2>
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
                     <tr className="text-left text-sm text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800/50">
-                      <th className="px-6 py-3 font-medium">Agent 名称</th>
-                      <th className="px-6 py-3 font-medium">请求次数</th>
-                      <th className="px-6 py-3 font-medium">总 Token 数</th>
+                      <th className="px-6 py-3 font-medium">Agent Name</th>
+                      <th className="px-6 py-3 font-medium">Request Count</th>
+                      <th className="px-6 py-3 font-medium">Total Tokens</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
@@ -222,7 +222,7 @@ export default function DashboardPage() {
                           colSpan={3}
                           className="px-6 py-8 text-center text-gray-500 dark:text-gray-400"
                         >
-                          暂无数据
+                          No data available
                         </td>
                       </tr>
                     ) : (
@@ -252,16 +252,16 @@ export default function DashboardPage() {
             <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800">
               <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-800">
                 <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                  按模型使用量
+                  Usage by Model
                 </h2>
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
                     <tr className="text-left text-sm text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800/50">
-                      <th className="px-6 py-3 font-medium">模型</th>
-                      <th className="px-6 py-3 font-medium">请求次数</th>
-                      <th className="px-6 py-3 font-medium">总 Token 数</th>
+                      <th className="px-6 py-3 font-medium">Model</th>
+                      <th className="px-6 py-3 font-medium">Request Count</th>
+                      <th className="px-6 py-3 font-medium">Total Tokens</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
@@ -271,7 +271,7 @@ export default function DashboardPage() {
                           colSpan={3}
                           className="px-6 py-8 text-center text-gray-500 dark:text-gray-400"
                         >
-                          暂无数据
+                          No data available
                         </td>
                       </tr>
                     ) : (

@@ -19,7 +19,7 @@ class WebSearchTool(BaseTool):
     
     @property
     def description(self) -> str:
-        return "搜索互联网获取最新信息。输入搜索关键词，返回相关网页结果。"
+        return "Search the internet for up-to-date information. Enter a search query and return relevant web results."
     
     @property
     def parameters(self) -> list[ToolParameter]:
@@ -27,13 +27,13 @@ class WebSearchTool(BaseTool):
             ToolParameter(
                 name="query",
                 type="string",
-                description="搜索关键词",
+                description="Search query",
                 required=True,
             ),
             ToolParameter(
                 name="num_results",
                 type="integer",
-                description="返回结果数量",
+                description="Number of results to return",
                 required=False,
                 default=5,
             ),
@@ -48,7 +48,7 @@ class WebSearchTool(BaseTool):
             return ToolResult(
                 success=False,
                 output="",
-                error="搜索关键词不能为空",
+                error="Search query cannot be empty",
             )
         
         # 优先使用 Serper API
@@ -56,7 +56,7 @@ class WebSearchTool(BaseTool):
             return await self._search_serper(query, num_results)
         else:
             # 降级到 DuckDuckGo
-            logger.info("SERPER_API_KEY 未配置，使用 DuckDuckGo 搜索")
+            logger.info("SERPER_API_KEY not configured, using DuckDuckGo search")
             return await self._search_duckduckgo(query, num_results)
     
     async def _search_serper(self, query: str, num_results: int) -> ToolResult:
@@ -76,19 +76,19 @@ class WebSearchTool(BaseTool):
             organic = data.get("organic", [])
             
             for i, item in enumerate(organic[:num_results], 1):
-                title = item.get("title", "无标题")
-                snippet = item.get("snippet", "无摘要")
+                title = item.get("title", "No title")
+                snippet = item.get("snippet", "No snippet")
                 link = item.get("link", "")
-                results.append(f"{i}. {title}\n   摘要: {snippet}\n   链接: {link}")
+                results.append(f"{i}. {title}\n   Snippet: {snippet}\n   Link: {link}")
             
             if not results:
                 return ToolResult(
                     success=True,
-                    output=f"搜索 '{query}' 未找到相关结果。",
+                    output=f"No results found for '{query}'.",
                     metadata={"source": "serper", "query": query},
                 )
             
-            output = f"搜索 '{query}' 的结果:\n\n" + "\n\n".join(results)
+            output = f"Results for '{query}':\n\n" + "\n\n".join(results)
             return ToolResult(
                 success=True,
                 output=output,
@@ -96,20 +96,20 @@ class WebSearchTool(BaseTool):
             )
             
         except httpx.HTTPStatusError as e:
-            logger.error(f"Serper API 请求失败: {e}")
+            logger.error(f"Serper API request failed: {e}")
             return ToolResult(
                 success=False,
                 output="",
-                error=f"Serper API 请求失败: HTTP {e.response.status_code}",
+                error=f"Serper API request failed: HTTP {e.response.status_code}",
             )
         except Exception as e:
-            logger.error(f"Serper 搜索出错: {e}")
+            logger.error(f"Serper search error: {e}")
             return ToolResult(
                 success=False,
                 output="",
-                error=f"搜索出错: {str(e)}",
+                error=f"Search error: {str(e)}",
             )
-    
+
     async def _search_duckduckgo(self, query: str, num_results: int) -> ToolResult:
         """使用 DuckDuckGo 搜索（免费备选方案）"""
         try:
@@ -129,7 +129,7 @@ class WebSearchTool(BaseTool):
             abstract = data.get("Abstract")
             abstract_url = data.get("AbstractURL")
             if abstract:
-                results.append(f"1. {data.get('Heading', '摘要')}\n   摘要: {abstract}\n   链接: {abstract_url}")
+                results.append(f"1. {data.get('Heading', 'Abstract')}\n   Snippet: {abstract}\n   Link: {abstract_url}")
             
             # 相关主题
             related_topics = data.get("RelatedTopics", [])
@@ -138,22 +138,22 @@ class WebSearchTool(BaseTool):
                     text = topic.get("Text", "")
                     url = topic.get("FirstURL", "")
                     if text:
-                        results.append(f"{i}. {text[:100]}...\n   链接: {url}")
+                        results.append(f"{i}. {text[:100]}...\n   Link: {url}")
             
             # 定义结果
             definition = data.get("Definition")
             if definition and len(results) < num_results:
-                results.append(f"{len(results) + 1}. 定义: {definition}")
+                results.append(f"{len(results) + 1}. Definition: {definition}")
             
             if not results:
                 # DuckDuckGo Instant Answer API 可能没有直接结果
                 return ToolResult(
                     success=True,
-                    output=f"搜索 '{query}' 未找到即时答案。DuckDuckGo Instant Answer API 主要返回摘要信息，可能需要更具体的查询。",
+                    output=f"No instant answers found for '{query}'. DuckDuckGo Instant Answer API mainly returns abstract info. Try a more specific query.",
                     metadata={"source": "duckduckgo", "query": query},
                 )
             
-            output = f"搜索 '{query}' 的结果 (DuckDuckGo):\n\n" + "\n\n".join(results)
+            output = f"Results for '{query}' (DuckDuckGo):\n\n" + "\n\n".join(results)
             return ToolResult(
                 success=True,
                 output=output,
@@ -161,18 +161,18 @@ class WebSearchTool(BaseTool):
             )
             
         except httpx.HTTPStatusError as e:
-            logger.error(f"DuckDuckGo API 请求失败: {e}")
+            logger.error(f"DuckDuckGo API request failed: {e}")
             return ToolResult(
                 success=False,
                 output="",
-                error=f"DuckDuckGo API 请求失败: HTTP {e.response.status_code}",
+                error=f"DuckDuckGo API request failed: HTTP {e.response.status_code}",
             )
         except Exception as e:
-            logger.error(f"DuckDuckGo 搜索出错: {e}")
+            logger.error(f"DuckDuckGo search error: {e}")
             return ToolResult(
                 success=False,
                 output="",
-                error=f"搜索出错: {str(e)}",
+                error=f"Search error: {str(e)}",
             )
 
 
@@ -185,7 +185,7 @@ class WebScrapeTool(BaseTool):
     
     @property
     def description(self) -> str:
-        return "抓取指定网页的主要文本内容。输入URL，返回页面主要内容。"
+        return "Scrape the main text content from a specified web page. Enter a URL and return the page's primary content."
     
     @property
     def parameters(self) -> list[ToolParameter]:
@@ -193,13 +193,13 @@ class WebScrapeTool(BaseTool):
             ToolParameter(
                 name="url",
                 type="string",
-                description="要抓取的网页URL",
+                description="URL of the web page to scrape",
                 required=True,
             ),
             ToolParameter(
                 name="max_length",
                 type="integer",
-                description="最大返回字符数",
+                description="Maximum characters to return",
                 required=False,
                 default=5000,
             ),
@@ -214,7 +214,7 @@ class WebScrapeTool(BaseTool):
             return ToolResult(
                 success=False,
                 output="",
-                error="URL 不能为空",
+                error="URL cannot be empty",
             )
         
         # 验证 URL 格式
@@ -222,7 +222,7 @@ class WebScrapeTool(BaseTool):
             return ToolResult(
                 success=False,
                 output="",
-                error="URL 必须以 http:// 或 https:// 开头",
+                error="URL must start with http:// or https://",
             )
         
         try:
@@ -243,7 +243,7 @@ class WebScrapeTool(BaseTool):
                 return ToolResult(
                     success=False,
                     output="",
-                    error=f"不支持的内容类型: {content_type}，仅支持 HTML 页面",
+                    error=f"Unsupported content type: {content_type}. Only HTML pages are supported",
                 )
             
             # 解析 HTML
@@ -252,43 +252,43 @@ class WebScrapeTool(BaseTool):
             
             # 截断到 max_length
             if len(text) > max_length:
-                text = text[:max_length] + "...\n\n[内容已截断]"
+                text = text[:max_length] + "...\n\n[Content truncated]"
             
             return ToolResult(
                 success=True,
-                output=f"网页内容 ({url}):\n\n{text}",
+                output=f"Web page content ({url}):\n\n{text}",
                 metadata={"url": url, "length": len(text)},
             )
             
         except httpx.TimeoutException:
-            logger.error(f"抓取超时: {url}")
+            logger.error(f"Scrape timed out: {url}")
             return ToolResult(
                 success=False,
                 output="",
-                error="请求超时，网页响应时间过长",
+                error="Request timed out, page took too long to respond",
             )
         except httpx.HTTPStatusError as e:
             status = e.response.status_code
             error_msg = {
-                403: "访问被拒绝 (403 Forbidden)，网站可能禁止爬虫访问",
-                404: "页面不存在 (404 Not Found)",
-                500: "服务器内部错误 (500)",
-                502: "网关错误 (502)",
-                503: "服务不可用 (503)",
-            }.get(status, f"HTTP 错误: {status}")
+                403: "Access denied (403 Forbidden), website may block crawlers",
+                404: "Page not found (404 Not Found)",
+                500: "Internal server error (500)",
+                502: "Bad gateway (502)",
+                503: "Service unavailable (503)",
+            }.get(status, f"HTTP error: {status}")
             
-            logger.error(f"抓取失败: {url}, HTTP {status}")
+            logger.error(f"Scrape failed: {url}, HTTP {status}")
             return ToolResult(
                 success=False,
                 output="",
                 error=error_msg,
             )
         except Exception as e:
-            logger.error(f"抓取出错: {url}, {e}")
+            logger.error(f"Scrape error: {url}, {e}")
             return ToolResult(
                 success=False,
                 output="",
-                error=f"抓取失败: {str(e)}",
+                error=f"Scrape failed: {str(e)}",
             )
     
     def _extract_text(self, html: str) -> str:

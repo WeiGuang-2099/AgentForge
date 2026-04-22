@@ -71,7 +71,7 @@ def safe_eval(expression: str) -> float:
     expression_lower = expression.lower()
     for d in dangerous:
         if d in expression_lower:
-            raise ValueError(f"不允许使用 '{d}'")
+            raise ValueError(f"Not allowed: '{d}'")
     
     # 使用 compile + eval 并限制命名空间
     code = compile(expression, "<calculator>", "eval")
@@ -87,7 +87,7 @@ class CalculatorTool(BaseTool):
     
     @property
     def description(self) -> str:
-        return "安全的数学计算工具。支持基础算术、三角函数、对数等。例如: '2 + 3 * 4', 'sqrt(16)', 'sin(pi/2)'"
+        return "Safe math calculator. Supports basic arithmetic, trigonometry, logarithms, etc. Examples: '2 + 3 * 4', 'sqrt(16)', 'sin(pi/2)'"
     
     @property
     def parameters(self) -> list[ToolParameter]:
@@ -95,7 +95,7 @@ class CalculatorTool(BaseTool):
             ToolParameter(
                 name="expression",
                 type="string",
-                description="数学表达式（如 '2 + 3 * 4', 'sqrt(16)', 'sin(pi/2)', 'log(100)'）",
+                description="Math expression (e.g., '2 + 3 * 4', 'sqrt(16)', 'sin(pi/2)', 'log(100)')",
                 required=True
             ),
         ]
@@ -116,13 +116,13 @@ class CalculatorTool(BaseTool):
             return ToolResult(
                 success=False,
                 output="",
-                error="缺少必需参数: expression"
+                error="Missing required parameter: expression"
             )
         
         try:
             result = safe_eval(expression)
             
-            logger.info(f"计算成功: {expression} = {result}")
+            logger.info(f"Calculation successful: {expression} = {result}")
             
             return ToolResult(
                 success=True,
@@ -144,20 +144,20 @@ class CalculatorTool(BaseTool):
             return ToolResult(
                 success=False,
                 output="",
-                error=f"表达式语法错误: {e}"
+                error=f"Expression syntax error: {e}"
             )
         except (ZeroDivisionError, OverflowError, ArithmeticError) as e:
             return ToolResult(
                 success=False,
                 output="",
-                error=f"计算错误: {e}"
+                error=f"Calculation error: {e}"
             )
         except Exception as e:
-            logger.error(f"计算失败: {expression}, 错误: {e}")
+            logger.error(f"Calculation failed: {expression}, error: {e}")
             return ToolResult(
                 success=False,
                 output="",
-                error=f"计算失败: {e}"
+                error=f"Calculation failed: {e}"
             )
 
 
@@ -170,7 +170,7 @@ class DataAnalyzerTool(BaseTool):
     
     @property
     def description(self) -> str:
-        return "分析 CSV 数据文件。支持统计描述、分组聚合、数据筛选等。"
+        return "Analyze CSV data files. Supports statistical summaries, groupby aggregation, data filtering, and more."
     
     @property
     def parameters(self) -> list[ToolParameter]:
@@ -178,20 +178,20 @@ class DataAnalyzerTool(BaseTool):
             ToolParameter(
                 name="file_path",
                 type="string",
-                description="CSV 文件路径（相对于 data/uploads/）",
+                description="CSV file path (relative to data/uploads/)",
                 required=True
             ),
             ToolParameter(
                 name="operation",
                 type="string",
-                description="操作类型",
+                description="Operation type",
                 required=True,
                 enum=["describe", "head", "groupby", "filter", "columns"]
             ),
             ToolParameter(
                 name="params",
                 type="string",
-                description="操作参数（JSON 字符串），不同操作需要不同参数。head: {\"n\": 10}; groupby: {\"by\": \"column_name\", \"agg\": \"mean\"}; filter: {\"column\": \"name\", \"op\": \"==\", \"value\": \"xxx\"}",
+                description="Operation parameters (JSON string). Different operations require different params. head: {\"n\": 10}; groupby: {\"by\": \"column_name\", \"agg\": \"mean\"}; filter: {\"column\": \"name\", \"op\": \"==\", \"value\": \"xxx\"}",
                 required=False
             ),
         ]
@@ -216,14 +216,14 @@ class DataAnalyzerTool(BaseTool):
             return ToolResult(
                 success=False,
                 output="",
-                error="缺少必需参数: file_path"
+                error="Missing required parameter: file_path"
             )
         
         if not operation:
             return ToolResult(
                 success=False,
                 output="",
-                error="缺少必需参数: operation"
+                error="Missing required parameter: operation"
             )
         
         # 解析参数
@@ -235,7 +235,7 @@ class DataAnalyzerTool(BaseTool):
                 return ToolResult(
                     success=False,
                     output="",
-                    error=f"params 参数不是有效的 JSON: {e}"
+                    error=f"params is not valid JSON: {e}"
                 )
         
         try:
@@ -247,7 +247,7 @@ class DataAnalyzerTool(BaseTool):
                 return ToolResult(
                     success=False,
                     output="",
-                    error=f"文件不存在: {file_path}"
+                    error=f"File not found: {file_path}"
                 )
             
             # 读取 CSV
@@ -255,7 +255,7 @@ class DataAnalyzerTool(BaseTool):
             
             # 执行操作
             if operation == "columns":
-                result = f"列名: {list(df.columns)}\n行数: {len(df)}\n数据类型:\n{df.dtypes.to_string()}"
+                result = f"Columns: {list(df.columns)}\nRows: {len(df)}\nData types:\n{df.dtypes.to_string()}"
             
             elif operation == "describe":
                 result = df.describe(include='all').to_string()
@@ -272,14 +272,14 @@ class DataAnalyzerTool(BaseTool):
                     return ToolResult(
                         success=False,
                         output="",
-                        error="groupby 操作需要 'by' 参数指定分组列"
+                        error="groupby operation requires 'by' parameter for column"
                     )
                 
                 if by not in df.columns:
                     return ToolResult(
                         success=False,
                         output="",
-                        error=f"列 '{by}' 不存在。可用列: {list(df.columns)}"
+                        error=f"Column '{by}' does not exist. Available columns: {list(df.columns)}"
                     )
                 
                 # 仅对数值列进行聚合
@@ -288,7 +288,7 @@ class DataAnalyzerTool(BaseTool):
                     return ToolResult(
                         success=False,
                         output="",
-                        error="没有可用于聚合的数值列"
+                        error="No numeric columns available for aggregation"
                     )
                 
                 grouped = df.groupby(by)[numeric_df.columns.tolist()].agg(agg)
@@ -303,21 +303,21 @@ class DataAnalyzerTool(BaseTool):
                     return ToolResult(
                         success=False,
                         output="",
-                        error="filter 操作需要 'column' 参数"
+                        error="filter operation requires 'column' parameter"
                     )
                 
                 if value is None:
                     return ToolResult(
                         success=False,
                         output="",
-                        error="filter 操作需要 'value' 参数"
+                        error="filter operation requires 'value' parameter"
                     )
                 
                 if column not in df.columns:
                     return ToolResult(
                         success=False,
                         output="",
-                        error=f"列 '{column}' 不存在。可用列: {list(df.columns)}"
+                        error=f"Column '{column}' does not exist. Available columns: {list(df.columns)}"
                     )
                 
                 # 根据操作符筛选
@@ -339,19 +339,19 @@ class DataAnalyzerTool(BaseTool):
                     return ToolResult(
                         success=False,
                         output="",
-                        error=f"不支持的操作符: {op}。支持: ==, !=, >, >=, <, <=, contains"
+                        error=f"Unsupported operator: {op}。Supported: ==, !=, >, >=, <, <=, contains"
                     )
                 
-                result = f"筛选结果 ({len(filtered)} 行):\n{filtered.to_string()}"
+                result = f"Filtered results ({len(filtered)} rows):\n{filtered.to_string()}"
             
             else:
                 return ToolResult(
                     success=False,
                     output="",
-                    error=f"不支持的操作: {operation}"
+                    error=f"Unsupported operation: {operation}"
                 )
             
-            logger.info(f"数据分析成功: {file_path}, 操作: {operation}")
+            logger.info(f"Data analysis successful: {file_path}, operation: {operation}")
             
             return ToolResult(
                 success=True,
@@ -375,20 +375,20 @@ class DataAnalyzerTool(BaseTool):
             return ToolResult(
                 success=False,
                 output="",
-                error="CSV 文件为空"
+                error="CSV file is empty"
             )
         except pd.errors.ParserError as e:
             return ToolResult(
                 success=False,
                 output="",
-                error=f"CSV 解析错误: {e}"
+                error=f"CSV parse error: {e}"
             )
         except Exception as e:
-            logger.error(f"数据分析失败: {file_path}, 错误: {e}")
+            logger.error(f"Data analysis failed: {file_path}, error: {e}")
             return ToolResult(
                 success=False,
                 output="",
-                error=f"数据分析失败: {e}"
+                error=f"Data analysis failed: {e}"
             )
 
 
@@ -401,7 +401,7 @@ class TranslatorTool(BaseTool):
     
     @property
     def description(self) -> str:
-        return "文本翻译工具。通过 LLM 进行多语言翻译。"
+        return "Text translation tool. Performs multilingual translation via LLM."
     
     @property
     def parameters(self) -> list[ToolParameter]:
@@ -409,19 +409,19 @@ class TranslatorTool(BaseTool):
             ToolParameter(
                 name="text",
                 type="string",
-                description="要翻译的文本",
+                description="Text to translate",
                 required=True
             ),
             ToolParameter(
                 name="target_language",
                 type="string",
-                description="目标语言（如 'English', '中文', '日本語', 'Español'）",
+                description="Target language (e.g., 'English', 'Chinese', 'Japanese', 'Spanish')",
                 required=True
             ),
             ToolParameter(
                 name="source_language",
                 type="string",
-                description="源语言（不指定则自动检测）",
+                description="Source language (auto-detected if not specified)",
                 required=False
             ),
         ]
@@ -446,33 +446,33 @@ class TranslatorTool(BaseTool):
             return ToolResult(
                 success=False,
                 output="",
-                error="缺少必需参数: text"
+                error="Missing required parameter: text"
             )
         
         if not target_language:
             return ToolResult(
                 success=False,
                 output="",
-                error="缺少必需参数: target_language"
+                error="Missing required parameter: target_language"
             )
         
         try:
             # 构建翻译 prompt
             if source_language:
-                prompt = f"将以下{source_language}文本翻译成{target_language}，只输出翻译结果，不要添加任何解释：\n\n{text}"
+                prompt = f"Translate the following {source_language} text into {target_language}. Output only the translation, without any explanation:\n\n{text}"
             else:
-                prompt = f"将以下文本翻译成{target_language}，只输出翻译结果，不要添加任何解释：\n\n{text}"
+                prompt = f"Translate the following text into {target_language}. Output only the translation, without any explanation:\n\n{text}"
             
             # 调用 LLM
             llm_client = LLMClient()
             response = await llm_client.acomplete([
-                {"role": "system", "content": "你是一个专业的翻译助手。请准确翻译用户提供的文本，保持原文的语气和风格。只输出翻译结果。"},
+                {"role": "system", "content": "You are a professional translation assistant. Please accurately translate the text provided by the user, maintaining the original tone and style. Output only the translation."},
                 {"role": "user", "content": prompt}
             ])
             
             translated_text = response.content.strip()
             
-            logger.info(f"翻译成功: {len(text)} 字符 -> {target_language}")
+            logger.info(f"Translation successful: {len(text)} chars -> {target_language}")
             
             return ToolResult(
                 success=True,
@@ -488,9 +488,9 @@ class TranslatorTool(BaseTool):
             )
             
         except Exception as e:
-            logger.error(f"翻译失败: {e}")
+            logger.error(f"Translation failed: {e}")
             return ToolResult(
                 success=False,
                 output="",
-                error=f"翻译失败: {e}"
+                error=f"Translation failed: {e}"
             )

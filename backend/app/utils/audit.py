@@ -30,4 +30,4 @@ async def log_audit(
         db.add(log)
         await db.commit()
     except Exception as e:
-        logger.error(f"记录审计日志失败: {e}")
+        logger.error(f"Failed to record audit log: {e}")

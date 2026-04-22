@@ -33,7 +33,7 @@ export const useSettingsStore = create<SettingsState>()(
       },
       defaultModel: "openai/gpt-4-turbo-preview",
       theme: "system",
-      language: "zh-CN",
+      language: "en",
 
       updateApiKey: (provider, key) =>
         set((state) => ({

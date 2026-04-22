@@ -45,17 +45,17 @@ class AgentRegistry:
     def register(self, profile: AgentProfile) -> None:
         """注册一个 Agent"""
         if profile.name in self._agents:
-            logger.warning(f"Agent '{profile.name}' 已存在，将被覆盖")
+            logger.warning(f"Agent '{profile.name}' already exists, will be overwritten")
         self._agents[profile.name] = profile
-        logger.debug(f"已注册 Agent: {profile.name}")
+        logger.debug(f"Registered agent: {profile.name}")
     
     def unregister(self, name: str) -> None:
         """注销一个 Agent"""
         if name in self._agents:
             del self._agents[name]
-            logger.debug(f"已注销 Agent: {name}")
+            logger.debug(f"Unregistered agent: {name}")
         else:
-            logger.warning(f"尝试注销不存在的 Agent: {name}")
+            logger.warning(f"Attempted to unregister non-existent agent: {name}")
     
     def get(self, name: str) -> Optional[AgentProfile]:
         """获取 Agent 配置"""
@@ -80,7 +80,7 @@ class AgentRegistry:
         """
         presets_dir = os.path.normpath(presets_dir)
         if not os.path.isdir(presets_dir):
-            logger.warning(f"Presets 目录不存在: {presets_dir}")
+            logger.warning(f"Presets directory does not exist: {presets_dir}")
             return 0
         
         loaded_count = 0
@@ -90,7 +90,7 @@ class AgentRegistry:
             
             # 跳过 team/ 子目录
             if os.path.isdir(filepath):
-                logger.debug(f"跳过目录: {filename}")
+                logger.debug(f"Skipping directory: {filename}")
                 continue
             
             # 只处理 .yaml 和 .yml 文件
@@ -103,7 +103,7 @@ class AgentRegistry:
                     self.register(profile)
                     loaded_count += 1
             except Exception as e:
-                logger.error(f"加载预设文件失败 {filepath}: {e}")
+                logger.error(f"Failed to load preset file {filepath}: {e}")
         
         return loaded_count
     
@@ -121,7 +121,7 @@ class AgentRegistry:
             data = yaml.safe_load(f)
         
         if not data:
-            logger.debug(f"跳过空的预设文件: {filepath}")
+            logger.debug(f"Skipping empty preset file: {filepath}")
             return None
         
         # 确保必需字段存在
@@ -163,7 +163,7 @@ class AgentEngine:
         presets_dir = os.path.normpath(presets_dir)
         
         count = self.registry.load_presets(presets_dir)
-        logger.info(f"已加载 {count} 个预置 Agent")
+        logger.info(f"Loaded {count} preset agents")
     
     def _get_llm_client(self, model: str, api_base: str = None, parameters: dict = None) -> LLMClient:
         """
@@ -180,7 +180,7 @@ class AgentEngine:
         cache_key = f"{model}:{api_base or 'default'}"
         if cache_key not in self._llm_clients:
             self._llm_clients[cache_key] = LLMClient(model=model, api_base=api_base)
-            logger.debug(f"创建新的 LLMClient: {model} (api_base: {api_base})")
+            logger.debug(f"Creating new LLMClient: {model} (api_base: {api_base})")
         return self._llm_clients[cache_key]
     
     def _build_messages(
@@ -252,8 +252,8 @@ class AgentEngine:
         """
         profile = self.registry.get(agent_name)
         if not profile:
-            raise AgentNotFoundError(f"Agent '{agent_name}' 未找到")
-        
+            raise AgentNotFoundError(f"Agent '{agent_name}' not found")
+
         llm_client = self._get_llm_client(profile.model, profile.api_base, profile.parameters)
         full_messages = self._build_messages(profile, messages)
         
@@ -320,8 +320,8 @@ class AgentEngine:
         """
         profile = self.registry.get(agent_name)
         if not profile:
-            raise AgentNotFoundError(f"Agent '{agent_name}' 未找到")
-        
+            raise AgentNotFoundError(f"Agent '{agent_name}' not found")
+
         # 如果 Agent 有工具，使用非流式 + 模拟流式（因为工具调用需要完整响应）
         if profile.tools and self._get_agent_tools(profile):
             response = await self.run(agent_name, messages, **kwargs)
@@ -373,5 +373,5 @@ class AgentEngine:
             注册后的 AgentProfile
         """
         self.registry.register(profile)
-        logger.info(f"已创建自定义 Agent: {profile.name}")
+        logger.info(f"Created custom agent: {profile.name}")
         return profile

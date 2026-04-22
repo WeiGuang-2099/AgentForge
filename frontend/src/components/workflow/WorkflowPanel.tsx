@@ -196,7 +196,7 @@ export function WorkflowPanel({ workflow, onBack }: WorkflowPanelProps) {
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
-              返回
+              Back
             </button>
             <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
               {workflow.display_name}
@@ -216,12 +216,12 @@ export function WorkflowPanel({ workflow, onBack }: WorkflowPanelProps) {
         {/* 任务输入 */}
         <div className="p-4 border-b border-gray-200 dark:border-gray-700">
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            任务描述
+            Task Description
           </label>
           <textarea
             value={task}
             onChange={(e) => setTask(e.target.value)}
-            placeholder="输入要执行的任务..."
+            placeholder="Enter the task to execute..."
             className={cn(
               "w-full h-24 px-3 py-2 rounded-lg resize-none",
               "bg-gray-50 dark:bg-gray-800",
@@ -251,7 +251,7 @@ export function WorkflowPanel({ workflow, onBack }: WorkflowPanelProps) {
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                   </svg>
-                  执行中...
+                  Executing...
                 </>
               ) : (
                 <>
@@ -259,7 +259,7 @@ export function WorkflowPanel({ workflow, onBack }: WorkflowPanelProps) {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
-                  开始执行
+                  Start Execution
                 </>
               )}
             </button>
@@ -275,7 +275,7 @@ export function WorkflowPanel({ workflow, onBack }: WorkflowPanelProps) {
                 "transition-colors"
               )}
             >
-              重置
+              Reset
             </button>
           </div>
         </div>
@@ -283,7 +283,7 @@ export function WorkflowPanel({ workflow, onBack }: WorkflowPanelProps) {
         {/* 步骤输出列表 */}
         <div className="flex-1 overflow-y-auto p-4 space-y-3">
           <h3 className="text-sm font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-2">
-            执行详情
+            Execution Details
           </h3>
           {workflow.steps.map((step) => {
             const output = stepOutputs[step.id];
@@ -348,7 +348,7 @@ export function WorkflowPanel({ workflow, onBack }: WorkflowPanelProps) {
                       content
                     ) : (
                       <span className="text-gray-400 dark:text-gray-500 italic">
-                        等待执行...
+                        Waiting to execute...
                       </span>
                     )}
                   </div>

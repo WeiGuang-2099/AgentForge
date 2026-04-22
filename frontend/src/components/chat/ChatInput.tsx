@@ -20,7 +20,7 @@ interface ChatInputProps {
 export function ChatInput({
   onSend,
   disabled = false,
-  placeholder = "输入消息...",
+  placeholder = "Type a message...",
 }: ChatInputProps) {
   const [value, setValue] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -109,7 +109,7 @@ export function ChatInput({
           "disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-blue-500",
           "active:scale-95"
         )}
-        aria-label="发送消息"
+        aria-label="Send message"
       >
         {disabled ? (
           // 加载动画

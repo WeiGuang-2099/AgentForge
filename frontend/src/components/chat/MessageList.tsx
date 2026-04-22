@@ -25,10 +25,10 @@ export function MessageList({ messages }: MessageListProps) {
         <div className="text-center">
           <div className="text-6xl mb-4 opacity-20">💬</div>
           <p className="text-gray-400 dark:text-gray-500 text-lg">
-            开始与 Agent 对话...
+            Start a conversation with the Agent...
           </p>
           <p className="text-gray-300 dark:text-gray-600 text-sm mt-2">
-            在下方输入您的问题
+            Enter your question below
           </p>
         </div>
       </div>
