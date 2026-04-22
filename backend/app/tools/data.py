@@ -122,7 +122,7 @@ class CalculatorTool(BaseTool):
         try:
             result = safe_eval(expression)
             
-            logger.info(f"计算成功: {expression} = {result}")
+            logger.info(f"Calculation successful: {expression} = {result}")
             
             return ToolResult(
                 success=True,
@@ -153,7 +153,7 @@ class CalculatorTool(BaseTool):
                 error=f"Calculation error: {e}"
             )
         except Exception as e:
-            logger.error(f"计算失败: {expression}, 错误: {e}")
+            logger.error(f"Calculation failed: {expression}, error: {e}")
             return ToolResult(
                 success=False,
                 output="",
@@ -178,20 +178,20 @@ class DataAnalyzerTool(BaseTool):
             ToolParameter(
                 name="file_path",
                 type="string",
-                description="CSV 文件路径（相对于 data/uploads/）",
+                description="CSV file path (relative to data/uploads/)",
                 required=True
             ),
             ToolParameter(
                 name="operation",
                 type="string",
-                description="操作类型",
+                description="Operation type",
                 required=True,
                 enum=["describe", "head", "groupby", "filter", "columns"]
             ),
             ToolParameter(
                 name="params",
                 type="string",
-                description="操作参数（JSON 字符串），不同操作需要不同参数。head: {\"n\": 10}; groupby: {\"by\": \"column_name\", \"agg\": \"mean\"}; filter: {\"column\": \"name\", \"op\": \"==\", \"value\": \"xxx\"}",
+                description="Operation parameters (JSON string). Different operations require different params. head: {\"n\": 10}; groupby: {\"by\": \"column_name\", \"agg\": \"mean\"}; filter: {\"column\": \"name\", \"op\": \"==\", \"value\": \"xxx\"}",
                 required=False
             ),
         ]
@@ -255,7 +255,7 @@ class DataAnalyzerTool(BaseTool):
             
             # 执行操作
             if operation == "columns":
-                result = f"列名: {list(df.columns)}\n行数: {len(df)}\n数据类型:\n{df.dtypes.to_string()}"
+                result = f"Columns: {list(df.columns)}\nRows: {len(df)}\nData types:\n{df.dtypes.to_string()}"
             
             elif operation == "describe":
                 result = df.describe(include='all').to_string()
@@ -342,16 +342,16 @@ class DataAnalyzerTool(BaseTool):
                         error=f"Unsupported operator: {op}。Supported: ==, !=, >, >=, <, <=, contains"
                     )
                 
-                result = f"筛选结果 ({len(filtered)} 行):\n{filtered.to_string()}"
+                result = f"Filtered results ({len(filtered)} rows):\n{filtered.to_string()}"
             
             else:
                 return ToolResult(
                     success=False,
                     output="",
-                    error=f"不支持的操作: {operation}"
+                    error=f"Unsupported operation: {operation}"
                 )
             
-            logger.info(f"数据分析成功: {file_path}, 操作: {operation}")
+            logger.info(f"Data analysis successful: {file_path}, operation: {operation}")
             
             return ToolResult(
                 success=True,
@@ -375,20 +375,20 @@ class DataAnalyzerTool(BaseTool):
             return ToolResult(
                 success=False,
                 output="",
-                error="CSV 文件为空"
+                error="CSV file is empty"
             )
         except pd.errors.ParserError as e:
             return ToolResult(
                 success=False,
                 output="",
-                error=f"CSV 解析错误: {e}"
+                error=f"CSV parse error: {e}"
             )
         except Exception as e:
-            logger.error(f"数据分析失败: {file_path}, 错误: {e}")
+            logger.error(f"Data analysis failed: {file_path}, error: {e}")
             return ToolResult(
                 success=False,
                 output="",
-                error=f"数据分析失败: {e}"
+                error=f"Data analysis failed: {e}"
             )
 
 
@@ -401,7 +401,7 @@ class TranslatorTool(BaseTool):
     
     @property
     def description(self) -> str:
-        return "文本翻译工具。通过 LLM 进行多语言翻译。"
+        return "Text translation tool. Performs multilingual translation via LLM."
     
     @property
     def parameters(self) -> list[ToolParameter]:
@@ -409,19 +409,19 @@ class TranslatorTool(BaseTool):
             ToolParameter(
                 name="text",
                 type="string",
-                description="要翻译的文本",
+                description="Text to translate",
                 required=True
             ),
             ToolParameter(
                 name="target_language",
                 type="string",
-                description="目标语言（如 'English', '中文', '日本語', 'Español'）",
+                description="Target language (e.g., 'English', 'Chinese', 'Japanese', 'Spanish')",
                 required=True
             ),
             ToolParameter(
                 name="source_language",
                 type="string",
-                description="源语言（不指定则自动检测）",
+                description="Source language (auto-detected if not specified)",
                 required=False
             ),
         ]
@@ -446,33 +446,33 @@ class TranslatorTool(BaseTool):
             return ToolResult(
                 success=False,
                 output="",
-                error="缺少必需参数: text"
+                error="Missing required parameter: text"
             )
         
         if not target_language:
             return ToolResult(
                 success=False,
                 output="",
-                error="缺少必需参数: target_language"
+                error="Missing required parameter: target_language"
             )
         
         try:
             # 构建翻译 prompt
             if source_language:
-                prompt = f"将以下{source_language}文本翻译成{target_language}，只输出翻译结果，不要添加任何解释：\n\n{text}"
+                prompt = f"Translate the following {source_language} text into {target_language}. Output only the translation, without any explanation:\n\n{text}"
             else:
-                prompt = f"将以下文本翻译成{target_language}，只输出翻译结果，不要添加任何解释：\n\n{text}"
+                prompt = f"Translate the following text into {target_language}. Output only the translation, without any explanation:\n\n{text}"
             
             # 调用 LLM
             llm_client = LLMClient()
             response = await llm_client.acomplete([
-                {"role": "system", "content": "你是一个专业的翻译助手。请准确翻译用户提供的文本，保持原文的语气和风格。只输出翻译结果。"},
+                {"role": "system", "content": "You are a professional translation assistant. Please accurately translate the text provided by the user, maintaining the original tone and style. Output only the translation."},
                 {"role": "user", "content": prompt}
             ])
             
             translated_text = response.content.strip()
             
-            logger.info(f"翻译成功: {len(text)} 字符 -> {target_language}")
+            logger.info(f"Translation successful: {len(text)} chars -> {target_language}")
             
             return ToolResult(
                 success=True,
@@ -488,9 +488,9 @@ class TranslatorTool(BaseTool):
             )
             
         except Exception as e:
-            logger.error(f"翻译失败: {e}")
+            logger.error(f"Translation failed: {e}")
             return ToolResult(
                 success=False,
                 output="",
-                error=f"翻译失败: {e}"
+                error=f"Translation failed: {e}"
             )

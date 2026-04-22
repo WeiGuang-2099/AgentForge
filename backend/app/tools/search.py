@@ -56,7 +56,7 @@ class WebSearchTool(BaseTool):
             return await self._search_serper(query, num_results)
         else:
             # 降级到 DuckDuckGo
-            logger.info("SERPER_API_KEY 未配置，使用 DuckDuckGo 搜索")
+            logger.info("SERPER_API_KEY not configured, using DuckDuckGo search")
             return await self._search_duckduckgo(query, num_results)
     
     async def _search_serper(self, query: str, num_results: int) -> ToolResult:
@@ -96,14 +96,14 @@ class WebSearchTool(BaseTool):
             )
             
         except httpx.HTTPStatusError as e:
-            logger.error(f"Serper API 请求失败: {e}")
+            logger.error(f"Serper API request failed: {e}")
             return ToolResult(
                 success=False,
                 output="",
                 error=f"Serper API request failed: HTTP {e.response.status_code}",
             )
         except Exception as e:
-            logger.error(f"Serper 搜索出错: {e}")
+            logger.error(f"Serper search error: {e}")
             return ToolResult(
                 success=False,
                 output="",
@@ -161,14 +161,14 @@ class WebSearchTool(BaseTool):
             )
             
         except httpx.HTTPStatusError as e:
-            logger.error(f"DuckDuckGo API 请求失败: {e}")
+            logger.error(f"DuckDuckGo API request failed: {e}")
             return ToolResult(
                 success=False,
                 output="",
                 error=f"DuckDuckGo API request failed: HTTP {e.response.status_code}",
             )
         except Exception as e:
-            logger.error(f"DuckDuckGo 搜索出错: {e}")
+            logger.error(f"DuckDuckGo search error: {e}")
             return ToolResult(
                 success=False,
                 output="",
@@ -256,12 +256,12 @@ class WebScrapeTool(BaseTool):
             
             return ToolResult(
                 success=True,
-                output=f"网页内容 ({url}):\n\n{text}",
+                output=f"Web page content ({url}):\n\n{text}",
                 metadata={"url": url, "length": len(text)},
             )
             
         except httpx.TimeoutException:
-            logger.error(f"抓取超时: {url}")
+            logger.error(f"Scrape timed out: {url}")
             return ToolResult(
                 success=False,
                 output="",
@@ -277,18 +277,18 @@ class WebScrapeTool(BaseTool):
                 503: "Service unavailable (503)",
             }.get(status, f"HTTP error: {status}")
             
-            logger.error(f"抓取失败: {url}, HTTP {status}")
+            logger.error(f"Scrape failed: {url}, HTTP {status}")
             return ToolResult(
                 success=False,
                 output="",
                 error=error_msg,
             )
         except Exception as e:
-            logger.error(f"抓取出错: {url}, {e}")
+            logger.error(f"Scrape error: {url}, {e}")
             return ToolResult(
                 success=False,
                 output="",
-                error=f"抓取失败: {str(e)}",
+                error=f"Scrape failed: {str(e)}",
             )
     
     def _extract_text(self, html: str) -> str:

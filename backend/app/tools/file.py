@@ -126,7 +126,7 @@ class ReadFileTool(BaseTool):
             # 获取文件大小
             file_size = os.path.getsize(safe_full_path)
             
-            logger.info(f"读取文件成功: {file_path}, 大小: {file_size} bytes")
+            logger.info(f"File read successfully: {file_path}, size: {file_size} bytes")
             
             return ToolResult(
                 success=True,
@@ -154,7 +154,7 @@ class ReadFileTool(BaseTool):
                 error=f"File encoding error, try a different encoding: {e}"
             )
         except Exception as e:
-            logger.error(f"读取文件失败: {file_path}, 错误: {e}")
+            logger.error(f"Failed to read file: {file_path}, error: {e}")
             return ToolResult(
                 success=False,
                 output="",
@@ -261,7 +261,7 @@ class WriteFileTool(BaseTool):
             parent_dir = os.path.dirname(safe_full_path)
             if not os.path.exists(parent_dir):
                 os.makedirs(parent_dir, exist_ok=True)
-                logger.info(f"创建目录: {parent_dir}")
+                logger.info(f"Created directory: {parent_dir}")
             
             # 4. 写入文件
             with open(safe_full_path, mode, encoding=encoding) as f:
@@ -271,7 +271,7 @@ class WriteFileTool(BaseTool):
             file_size = os.path.getsize(safe_full_path)
             
             mode_desc = "Overwrite" if mode == "w" else "Append"
-            logger.info(f"写入文件成功: {file_path}, 模式: {mode_desc}, 大小: {file_size} bytes")
+            logger.info(f"File written successfully: {file_path}, mode: {mode_desc}, size: {file_size} bytes")
             
             return ToolResult(
                 success=True,
@@ -294,7 +294,7 @@ class WriteFileTool(BaseTool):
                 error=str(e)
             )
         except Exception as e:
-            logger.error(f"写入文件失败: {file_path}, 错误: {e}")
+            logger.error(f"Failed to write file: {file_path}, error: {e}")
             return ToolResult(
                 success=False,
                 output="",

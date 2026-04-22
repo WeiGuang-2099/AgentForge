@@ -18,11 +18,11 @@ class ConnectionManager:
     async def connect(self, conversation_id: str, websocket: WebSocket):
         await websocket.accept()
         self.active_connections[conversation_id] = websocket
-        logger.info(f"WebSocket 已连接: {conversation_id}")
+        logger.info(f"WebSocket connected: {conversation_id}")
     
     def disconnect(self, conversation_id: str):
         self.active_connections.pop(conversation_id, None)
-        logger.info(f"WebSocket 已断开: {conversation_id}")
+        logger.info(f"WebSocket disconnected: {conversation_id}")
     
     async def send_json(self, conversation_id: str, data: dict):
         ws = self.active_connections.get(conversation_id)
@@ -95,7 +95,7 @@ async def websocket_chat(websocket: WebSocket, conversation_id: str):
                     await websocket.send_json({"type": "done"})
                     
                 except Exception as e:
-                    logger.error(f"Agent 执行错误: {e}")
+                    logger.error(f"Agent execution error: {e}")
                     await websocket.send_json({
                         "type": "error",
                         "message": str(e),
@@ -106,5 +106,5 @@ async def websocket_chat(websocket: WebSocket, conversation_id: str):
     except WebSocketDisconnect:
         manager.disconnect(conversation_id)
     except Exception as e:
-        logger.error(f"WebSocket 异常: {e}")
+        logger.error(f"WebSocket exception: {e}")
         manager.disconnect(conversation_id)

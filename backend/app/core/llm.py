@@ -187,13 +187,13 @@ class LLMClient:
                 last_error = e
                 wait_time = (2 ** attempt) * 1  # 指数退避: 1s, 2s, 4s
                 logger.warning(
-                    f"LLM 调用失败 (尝试 {attempt + 1}/{self.max_retries}): {e}. "
-                    f"等待 {wait_time}s 后重试..."
+                    f"LLM call failed (attempt {attempt + 1}/{self.max_retries}): {e}. "
+                    f"Retrying in {wait_time}s..."
                 )
                 if attempt < self.max_retries - 1:
                     await asyncio.sleep(wait_time)
         
-        raise LLMError(f"LLM 调用在 {self.max_retries} 次重试后仍然失败: {last_error}")
+        raise LLMError(f"LLM call failed after {self.max_retries} retries: {last_error}")
     
     async def astream(self, messages: list[dict], **kwargs) -> AsyncGenerator[str, None]:
         """
@@ -228,13 +228,13 @@ class LLMClient:
                 last_error = e
                 wait_time = (2 ** attempt) * 1
                 logger.warning(
-                    f"LLM 流式调用失败 (尝试 {attempt + 1}/{self.max_retries}): {e}. "
-                    f"等待 {wait_time}s 后重试..."
+                    f"LLM stream call failed (attempt {attempt + 1}/{self.max_retries}): {e}. "
+                    f"Retrying in {wait_time}s..."
                 )
                 if attempt < self.max_retries - 1:
                     await asyncio.sleep(wait_time)
         
-        raise LLMError(f"LLM 流式调用在 {self.max_retries} 次重试后仍然失败: {last_error}")
+        raise LLMError(f"LLM stream call failed after {self.max_retries} retries: {last_error}")
     
     async def acomplete_with_tools(
         self, 

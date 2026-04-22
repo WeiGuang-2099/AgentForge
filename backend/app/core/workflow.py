@@ -159,9 +159,9 @@ class WorkflowEngine:
                     filepath = os.path.join(team_dir, filename)
                     self.load_workflow_from_yaml(filepath)
                     count += 1
-                    logger.info(f"已加载团队工作流: {filename}")
+                    logger.info(f"Loaded team workflow: {filename}")
                 except Exception as e:
-                    logger.warning(f"加载工作流 {filename} 失败: {e}")
+                    logger.warning(f"Failed to load workflow {filename}: {e}")
         return count
     
     def get_workflow(self, name: str) -> Optional[WorkflowDefinition]:
@@ -185,7 +185,7 @@ class WorkflowEngine:
         """
         definition = self._workflows.get(workflow_name)
         if not definition:
-            raise ValueError(f"工作流 '{workflow_name}' 不存在")
+            raise ValueError(f"Workflow '{workflow_name}' does not exist")
         
         # 创建步骤副本（避免修改原定义）
         steps = [
@@ -221,7 +221,7 @@ class WorkflowEngine:
                 # 死锁检测
                 pending = [s for s in steps if s.status == StepStatus.PENDING]
                 if pending:
-                    logger.error(f"工作流死锁: {[s.id for s in pending]} 无法执行")
+                    logger.error(f"Workflow deadlock: {[s.id for s in pending]} cannot execute")
                     for s in pending:
                         s.status = StepStatus.SKIPPED
                 break
@@ -248,7 +248,7 @@ class WorkflowEngine:
                 if isinstance(result, Exception):
                     step.status = StepStatus.FAILED
                     step.error = str(result)
-                    logger.error(f"步骤 '{step.id}' 执行失败: {result}")
+                    logger.error(f"Step '{step.id}' execution failed: {result}")
                 else:
                     step.status = StepStatus.COMPLETED
                     step.result = result
@@ -272,7 +272,7 @@ class WorkflowEngine:
     
     async def _execute_step(self, step: WorkflowStep, task: str, context: dict) -> str:
         """执行单个工作流步骤"""
-        logger.info(f"执行步骤: {step.id} (Agent: {step.agent_name})")
+        logger.info(f"Executing step: {step.id} (Agent: {step.agent_name})")
         return await self.orchestrator.execute_agent_task(step.agent_name, task, context)
     
     async def execute_stream(self, workflow_name: str, user_task: str) -> AsyncGenerator[dict, None]:
@@ -289,7 +289,7 @@ class WorkflowEngine:
         """
         definition = self._workflows.get(workflow_name)
         if not definition:
-            yield {"type": "error", "message": f"工作流 '{workflow_name}' 不存在"}
+            yield {"type": "error", "message": f"Workflow '{workflow_name}' does not exist"}
             return
         
         steps = [
@@ -311,7 +311,7 @@ class WorkflowEngine:
             )
             if not deps_met:
                 step.status = StepStatus.SKIPPED
-                yield {"type": "step_skip", "step_id": step.id, "reason": "依赖未满足"}
+                yield {"type": "step_skip", "step_id": step.id, "reason": "Dependencies not satisfied"}
                 continue
             
             step.status = StepStatus.RUNNING

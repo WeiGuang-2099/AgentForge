@@ -112,7 +112,7 @@ class ToolRegistry:
     def register(self, tool: BaseTool) -> None:
         """注册工具"""
         self._tools[tool.name] = tool
-        logger.info(f"已注册工具: {tool.name}")
+        logger.info(f"Registered tool: {tool.name}")
     
     def unregister(self, name: str) -> None:
         """注销工具"""

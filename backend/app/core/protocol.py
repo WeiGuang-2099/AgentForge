@@ -209,7 +209,7 @@ class MultiAgentOrchestrator:
         except Exception as e:
             state.status = AgentStatus.ERROR
             state.error = str(e)
-            logger.error(f"Agent '{agent_name}' 执行失败: {e}")
+            logger.error(f"Agent '{agent_name}' execution failed: {e}")
             raise
     
     async def execute_agent_task_stream(self, agent_name: str, task: str,

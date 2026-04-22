@@ -86,7 +86,7 @@ class ToolRunner:
             except json.JSONDecodeError:
                 arguments = {}
             
-            logger.info(f"执行工具: {tool_name}, 参数: {arguments}")
+            logger.info(f"Executing tool: {tool_name}, args: {arguments}")
             
             # 执行工具
             result = await self.execute_tool_call(tool_name, arguments)
