@@ -36,8 +36,8 @@ async def activate_plugin(name: str):
     manager = get_plugin_manager()
     success = await manager.activate_plugin(name)
     if not success:
-        raise HTTPException(status_code=404, detail=f"插件 '{name}' 未找到或激活失败")
-    return {"message": f"插件 '{name}' 已激活"}
+        raise HTTPException(status_code=404, detail=f"Plugin '{name}' not found or activation failed")
+    return {"message": f"Plugin '{name}' activated"}
 
 
 @router.post("/plugins/{name}/deactivate")
@@ -46,5 +46,5 @@ async def deactivate_plugin(name: str):
     manager = get_plugin_manager()
     success = await manager.deactivate_plugin(name)
     if not success:
-        raise HTTPException(status_code=404, detail=f"插件 '{name}' 未找到或停用失败")
-    return {"message": f"插件 '{name}' 已停用"}
+        raise HTTPException(status_code=404, detail=f"Plugin '{name}' not found or deactivation failed")
+    return {"message": f"Plugin '{name}' deactivated"}

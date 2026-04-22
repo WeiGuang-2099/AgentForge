@@ -37,7 +37,7 @@ async def register(req: RegisterRequest, db: AsyncSession = Depends(get_db)):
     # 检查邮箱是否已存在
     result = await db.execute(select(User).where(User.email == req.email))
     if result.scalar_one_or_none():
-        raise HTTPException(status_code=409, detail="邮箱已注册")
+        raise HTTPException(status_code=409, detail="Email already registered")
     
     user = User(name=req.name, email=req.email, password_hash=hash_password(req.password))
     db.add(user)
@@ -61,7 +61,7 @@ async def login(req: LoginRequest, db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(User).where(User.email == req.email))
     user = result.scalar_one_or_none()
     if not user or not user.password_hash or not verify_password(req.password, user.password_hash):
-        raise HTTPException(status_code=401, detail="邮箱或密码错误")
+        raise HTTPException(status_code=401, detail="Invalid email or password")
     
     access_token = create_access_token({"sub": str(user.id)})
     refresh_token = create_refresh_token({"sub": str(user.id)})
@@ -79,13 +79,13 @@ async def login(req: LoginRequest, db: AsyncSession = Depends(get_db)):
 async def refresh(req: RefreshRequest, db: AsyncSession = Depends(get_db)):
     payload = decode_token(req.refresh_token)
     if payload.get("type") != "refresh":
-        raise HTTPException(status_code=401, detail="无效的刷新令牌")
+        raise HTTPException(status_code=401, detail="Invalid refresh token")
     
     user_id = payload.get("sub")
     result = await db.execute(select(User).where(User.id == user_id))
     user = result.scalar_one_or_none()
     if not user:
-        raise HTTPException(status_code=404, detail="用户不存在")
+        raise HTTPException(status_code=404, detail="User not found")
     
     access_token = create_access_token({"sub": str(user.id)})
     refresh_token = create_refresh_token({"sub": str(user.id)})

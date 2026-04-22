@@ -132,7 +132,7 @@ async def chat(req: ChatRequest, db: AsyncSession = Depends(get_db)):
     except AgentNotFoundError as e:
         raise HTTPException(status_code=404, detail=str(e))
     except LLMError as e:
-        raise HTTPException(status_code=502, detail=f"LLM 调用失败: {str(e)}")
+        raise HTTPException(status_code=502, detail=f"LLM call failed: {str(e)}")
 
 
 @router.post("/chat/stream")
@@ -144,7 +144,7 @@ async def chat_stream(req: ChatRequest, db: AsyncSession = Depends(get_db)):
 
     profile = engine.get_agent(req.agent_name)
     if not profile:
-        raise HTTPException(status_code=404, detail=f"Agent '{req.agent_name}' 未找到")
+        raise HTTPException(status_code=404, detail=f"Agent '{req.agent_name}' not found")
 
     first_msg = req.messages[0].content if req.messages else ""
     conv = await _get_or_create_conversation(

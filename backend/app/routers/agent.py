@@ -61,7 +61,7 @@ async def get_agent(name: str):
     engine = get_engine()
     profile = engine.get_agent(name)
     if not profile:
-        raise HTTPException(status_code=404, detail=f"Agent '{name}' 未找到")
+        raise HTTPException(status_code=404, detail=f"Agent '{name}' not found")
     return AgentInfo(
         name=profile.name,
         display_name=profile.display_name,
@@ -80,7 +80,7 @@ async def create_agent(req: AgentCreateRequest, db: AsyncSession = Depends(get_d
 
     # 检查名称是否已存在
     if engine.get_agent(req.name):
-        raise HTTPException(status_code=409, detail=f"Agent '{req.name}' 已存在")
+        raise HTTPException(status_code=409, detail=f"Agent '{req.name}' already exists")
 
     profile = AgentProfile(
         name=req.name,
@@ -100,5 +100,5 @@ async def create_agent(req: AgentCreateRequest, db: AsyncSession = Depends(get_d
     return AgentCreateResponse(
         name=profile.name,
         display_name=profile.display_name,
-        message="Agent 创建成功",
+        message="Agent created successfully",
     )

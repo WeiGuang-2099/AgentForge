@@ -74,12 +74,12 @@ async def delete_api_key(key_id: str, user_id: str = Depends(get_current_user), 
     result = await db.execute(select(UserApiKey).where(UserApiKey.id == key_id, UserApiKey.user_id == user_id))
     key = result.scalar_one_or_none()
     if not key:
-        raise HTTPException(status_code=404, detail="API Key 未找到")
+        raise HTTPException(status_code=404, detail="API Key not found")
     await db.delete(key)
     await db.commit()
     from app.utils.audit import log_audit
     await log_audit(db, action="delete_api_key", user_id=user_id, resource_type="api_key", detail=f"Deleted key {key_id}")
-    return {"message": "已删除"}
+    return {"message": "Deleted"}
 
 
 @router.post("/apikeys/{key_id}/validate", response_model=ApiKeyValidateResponse)
@@ -88,10 +88,10 @@ async def validate_api_key(key_id: str, user_id: str = Depends(get_current_user)
     result = await db.execute(select(UserApiKey).where(UserApiKey.id == key_id, UserApiKey.user_id == user_id))
     key = result.scalar_one_or_none()
     if not key:
-        raise HTTPException(status_code=404, detail="API Key 未找到")
+        raise HTTPException(status_code=404, detail="API Key not found")
     
     decrypted = decrypt(key.encrypted_key)
     is_valid = len(decrypted) > 10  # 简单格式检查
     key.is_valid = is_valid
     await db.commit()
-    return ApiKeyValidateResponse(provider=key.provider, is_valid=is_valid, message="Key 格式有效" if is_valid else "Key 格式无效")
+    return ApiKeyValidateResponse(provider=key.provider, is_valid=is_valid, message="Key format is valid" if is_valid else "Key format is invalid")

@@ -1,70 +1,70 @@
 name: research_team
-display_name: 研究团队
-description: 多Agent协作完成研究调研任务。搜索员收集信息，分析员整理分析，撰写者输出报告。
+display_name: Research Team
+description: Multi-agent collaboration for research tasks. Searcher collects information, analyst synthesizes findings, writer produces reports.
 mode: team
 
 agents:
   - role: searcher
-    name: 搜索员
-    responsibility: 搜索和收集相关信息
+    name: Searcher
+    responsibility: Search and collect relevant information
     model: gpt-4-turbo-preview
     system_prompt: |
-      你是一位专业的信息搜索专家。
-      
-      职责：
-      - 理解研究课题
-      - 搜索多个信息源
-      - 收集关键数据和观点
-      - 记录信息来源
-      
-      输出要求：
-      - 列出搜索到的关键信息点
-      - 标注信息来源和可信度
-      - 覆盖多个角度和视角
+      You are a professional information search specialist.
+
+      Responsibilities:
+      - Understand the research topic
+      - Search multiple information sources
+      - Collect key data and viewpoints
+      - Record information sources
+
+      Output requirements:
+      - List key information points found
+      - Note information sources and credibility
+      - Cover multiple angles and perspectives
 
   - role: analyst
-    name: 分析员
-    responsibility: 分析、对比和整理收集到的信息
+    name: Analyst
+    responsibility: Analyze, compare, and synthesize collected information
     model: gpt-4-turbo-preview
     system_prompt: |
-      你是一位数据分析和逻辑推理专家。
-      
-      职责：
-      - 分析和验证搜索员收集的信息
-      - 发现数据中的模式和趋势
-      - 对比不同来源的观点
-      - 提炼关键洞察
-      
-      输出要求：
-      - 结构化的分析结论
-      - 数据对比表格
-      - 关键发现总结
+      You are a data analysis and logical reasoning expert.
+
+      Responsibilities:
+      - Analyze and verify information collected by the searcher
+      - Identify patterns and trends in the data
+      - Compare viewpoints from different sources
+      - Extract key insights
+
+      Output requirements:
+      - Structured analysis conclusions
+      - Data comparison tables
+      - Key findings summary
 
   - role: writer
-    name: 报告撰写者
-    responsibility: 撰写结构化的研究报告
+    name: Report Writer
+    responsibility: Write structured research reports
     model: gpt-4-turbo-preview
     system_prompt: |
-      你是一位专业的研究报告撰写者。
-      
-      职责：
-      - 基于分析结果撰写完整报告
-      - 确保逻辑清晰、结构完整
-      - 使用专业且易懂的语言
-      
-      报告结构：
-      1. 摘要
-      2. 背景介绍
-      3. 研究发现
-      4. 分析讨论
-      5. 结论和建议
+      You are a professional research report writer.
+
+      Responsibilities:
+      - Write a complete report based on analysis results
+      - Ensure clear logic and complete structure
+      - Use professional yet accessible language
+
+      Report structure:
+      1. Executive Summary
+      2. Background
+      3. Research Findings
+      4. Analysis and Discussion
+      5. Conclusions and Recommendations
 
 workflow:
   - agent: searcher
-    task: "围绕研究课题，搜索和收集相关的关键信息和数据"
+    task: "Search and collect key information and data related to the research topic"
   - agent: analyst
-    task: "分析搜索员收集的信息，提炼关键洞察和结论"
+    task: "Analyze the information collected by the searcher and extract key insights and conclusions"
     depends_on: [searcher]
   - agent: writer
-    task: "基于分析结果，撰写一份结构完整的研究报告"
+    task: "Write a well-structured research report based on the analysis results"
     depends_on: [analyst]

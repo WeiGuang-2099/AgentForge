@@ -18,7 +18,7 @@ class Conversation(Base, UUIDMixin, TimestampMixin):
         nullable=True
     )
     agent_name: Mapped[str] = mapped_column(String(255), nullable=False)
-    title: Mapped[str] = mapped_column(String(500), default="新对话", nullable=False)
+    title: Mapped[str] = mapped_column(String(500), default="New Conversation", nullable=False)
 
     # Relationships
     user = relationship("User", backref="conversations", lazy="selectin")

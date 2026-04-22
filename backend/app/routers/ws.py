@@ -64,7 +64,7 @@ async def websocket_chat(websocket: WebSocket, conversation_id: str):
             try:
                 data = json.loads(raw_data)
             except json.JSONDecodeError:
-                await websocket.send_json({"type": "error", "message": "无效的 JSON 格式"})
+                await websocket.send_json({"type": "error", "message": "Invalid JSON format"})
                 continue
             
             msg_type = data.get("type", "")
@@ -80,7 +80,7 @@ async def websocket_chat(websocket: WebSocket, conversation_id: str):
                 messages = data.get("messages", [])
                 
                 if not messages:
-                    await websocket.send_json({"type": "error", "message": "消息列表不能为空"})
+                    await websocket.send_json({"type": "error", "message": "Message list cannot be empty"})
                     continue
                 
                 try:
@@ -101,7 +101,7 @@ async def websocket_chat(websocket: WebSocket, conversation_id: str):
                         "message": str(e),
                     })
             else:
-                await websocket.send_json({"type": "error", "message": f"未知消息类型: {msg_type}"})
+                await websocket.send_json({"type": "error", "message": f"Unknown message type: {msg_type}"})
     
     except WebSocketDisconnect:
         manager.disconnect(conversation_id)

@@ -41,7 +41,7 @@ def decode_token(token: str) -> dict:
     try:
         return jwt.decode(token, settings.APP_SECRET_KEY, algorithms=[ALGORITHM])
     except JWTError:
-        raise HTTPException(status_code=401, detail="无效的认证令牌")
+        raise HTTPException(status_code=401, detail="Invalid authentication token")
 
 async def get_current_user_optional(credentials: Optional[HTTPAuthorizationCredentials] = Depends(security)):
     """可选的用户认证（不强制）"""
@@ -58,5 +58,5 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(H
     payload = decode_token(credentials.credentials)
     user_id = payload.get("sub")
     if not user_id:
-        raise HTTPException(status_code=401, detail="无效的认证令牌")
+        raise HTTPException(status_code=401, detail="Invalid authentication token")
     return user_id
