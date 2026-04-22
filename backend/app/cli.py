@@ -88,22 +88,37 @@ async def chat_loop(engine: AgentEngine, agent_name: str):
             messages.pop()
 
 
+async def init_db_cmd():
+    """Run database migrations."""
+    from app.models.database import init_db, close_db
+    print("Initializing database...")
+    await init_db()
+    await close_db()
+    print("Database initialized successfully.")
+
+
 async def main():
     parser = argparse.ArgumentParser(description="AgentForge CLI - 命令行交互工具")
     parser.add_argument("--agent", "-a", type=str, default="assistant",
                        help="选择 Agent (默认: assistant)")
     parser.add_argument("--list", "-l", action="store_true",
                        help="列出所有可用 Agent")
+    parser.add_argument("--init-db", action="store_true",
+                       help="初始化数据库表")
     args = parser.parse_args()
-    
+
+    if args.init_db:
+        await init_db_cmd()
+        return
+
     # 初始化引擎
     engine = AgentEngine()
     await engine.initialize()
-    
+
     if args.list:
         await list_agents(engine)
         return
-    
+
     await chat_loop(engine, args.agent)
 
 

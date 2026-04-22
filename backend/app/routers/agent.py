@@ -1,7 +1,10 @@
 """Agent 管理路由"""
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel
 from typing import Optional
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.models.database import get_db
 
 router = APIRouter()
 
@@ -69,16 +72,16 @@ async def get_agent(name: str):
     )
 
 @router.post("/agents", response_model=AgentCreateResponse)
-async def create_agent(req: AgentCreateRequest):
+async def create_agent(req: AgentCreateRequest, db: AsyncSession = Depends(get_db)):
     """创建自定义 Agent"""
     from app.main import get_engine
     from app.core.agent import AgentProfile
     engine = get_engine()
-    
+
     # 检查名称是否已存在
     if engine.get_agent(req.name):
         raise HTTPException(status_code=409, detail=f"Agent '{req.name}' 已存在")
-    
+
     profile = AgentProfile(
         name=req.name,
         display_name=req.display_name,
@@ -90,6 +93,10 @@ async def create_agent(req: AgentCreateRequest):
         is_preset=False,
     )
     await engine.create_agent(profile)
+
+    from app.utils.audit import log_audit
+    await log_audit(db, action="create_agent", resource_type="agent", detail=f"Created agent {req.name}")
+
     return AgentCreateResponse(
         name=profile.name,
         display_name=profile.display_name,

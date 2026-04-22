@@ -13,6 +13,7 @@ chromadb>=0.4.22
 # Database
 sqlalchemy[asyncio]>=2.0.25
 asyncpg>=0.29.0
+alembic>=1.13.0
 
 # Data Validation
 pydantic>=2.5.0

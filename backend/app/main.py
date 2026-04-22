@@ -12,6 +12,7 @@ from app.core.workflow import WorkflowEngine
 from app.plugins import PluginManager
 from app.routers import agent, apikey, audit, auth, chat, marketplace, tool, usage, ws, workflow, plugin
 from app.tools import register_all_tools
+from app.models.database import init_db, close_db
 
 # 配置日志
 logging.basicConfig(level=logging.DEBUG if settings.APP_DEBUG else logging.INFO)
@@ -44,9 +45,12 @@ async def lifespan(app: FastAPI):
     plugin_count = plugin_manager.discover_plugins()
     active_count = await plugin_manager.activate_all()
     logger.info(f"已发现 {plugin_count} 个插件，已激活 {active_count} 个")
-    # 注意：数据库初始化在生产环境中由 init_db.py 脚本完成
-    # 这里不自动创建表，避免每次启动都执行
+    # 初始化数据库表
+    await init_db()
+    logger.info("数据库已初始化")
     yield
+    # 关闭数据库连接
+    await close_db()
     logger.info("AgentForge API 关闭")
 
 app = FastAPI(

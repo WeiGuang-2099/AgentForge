@@ -43,7 +43,10 @@ async def register(req: RegisterRequest, db: AsyncSession = Depends(get_db)):
     db.add(user)
     await db.commit()
     await db.refresh(user)
-    
+
+    from app.utils.audit import log_audit
+    await log_audit(db, action="register", user_id=str(user.id), resource_type="user", detail=f"User {user.name} registered")
+
     access_token = create_access_token({"sub": str(user.id)})
     refresh_token = create_refresh_token({"sub": str(user.id)})
     
@@ -62,7 +65,10 @@ async def login(req: LoginRequest, db: AsyncSession = Depends(get_db)):
     
     access_token = create_access_token({"sub": str(user.id)})
     refresh_token = create_refresh_token({"sub": str(user.id)})
-    
+
+    from app.utils.audit import log_audit
+    await log_audit(db, action="login", user_id=str(user.id), resource_type="auth", detail=f"User {user.email} logged in")
+
     return TokenResponse(
         access_token=access_token,
         refresh_token=refresh_token,
