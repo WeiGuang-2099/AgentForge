@@ -25,17 +25,17 @@ export default function Home() {
                 AgentForge
               </h1>
               <p className="text-base md:text-lg text-gray-500 dark:text-gray-400">
-                开箱即用的多Agent协作框架
+                Ready-to-use multi-agent collaboration framework
               </p>
               <p className="mt-2 text-sm text-gray-400 dark:text-gray-500 hidden md:block">
-                从左侧选择一个 Agent 开始对话
+                Select an Agent from the sidebar to start chatting
               </p>
               <p className="mt-2 text-sm text-gray-400 dark:text-gray-500 md:hidden">
-                点击左上角菜单选择 Agent 开始对话
+                Tap the menu icon in the top-left to select an Agent
               </p>
               <div className="mt-8 flex items-center justify-center gap-2 text-sm text-gray-400 dark:text-gray-500">
                 <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                准备就绪
+                Ready
               </div>
             </div>
           </div>

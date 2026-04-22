@@ -13,7 +13,7 @@ export function generateId(): string {
 
 /** 格式化日期 */
 export function formatDate(date: string | Date): string {
-  return new Intl.DateTimeFormat("zh-CN", {
+  return new Intl.DateTimeFormat("en", {
     month: "short",
     day: "numeric",
     hour: "2-digit",

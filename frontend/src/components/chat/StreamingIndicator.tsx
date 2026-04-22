@@ -38,7 +38,7 @@ export function StreamingIndicator() {
       </div>
       {/* 文字提示 */}
       <span className="text-sm text-gray-500 dark:text-gray-400">
-        思考中...
+        Thinking...
       </span>
     </div>
   );

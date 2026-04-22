@@ -66,7 +66,7 @@ function ConversationItem({
             "hover:bg-red-50 dark:hover:bg-red-900/20",
             "transition-colors duration-150"
           )}
-          title="删除会话"
+          title="Delete conversation"
         >
           <svg
             className="w-4 h-4"
@@ -124,7 +124,7 @@ export function ConversationList({ collapsed = false }: ConversationListProps) {
 
   /** 删除会话 */
   const handleDeleteConversation = (id: string) => {
-    if (confirm("确定要删除这个会话吗？")) {
+    if (confirm("Are you sure you want to delete this conversation?")) {
       deleteConversation(id);
     }
   };
@@ -138,7 +138,7 @@ export function ConversationList({ collapsed = false }: ConversationListProps) {
       {/* 标题栏 */}
       <div className="flex items-center justify-between px-4 py-2">
         <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-          对话历史
+          Chat History
         </h3>
         <button
           onClick={handleCreateConversation}
@@ -150,7 +150,7 @@ export function ConversationList({ collapsed = false }: ConversationListProps) {
             "transition-colors duration-150",
             "disabled:opacity-50 disabled:cursor-not-allowed"
           )}
-          title="新建对话"
+          title="New chat"
         >
           <svg
             className="w-4 h-4"
@@ -189,7 +189,7 @@ export function ConversationList({ collapsed = false }: ConversationListProps) {
           // 空状态
           <div className="flex flex-col items-center justify-center py-12 text-gray-400 dark:text-gray-500">
             <div className="text-3xl mb-2">📭</div>
-            <p className="text-sm">暂无对话记录</p>
+            <p className="text-sm">No conversations yet</p>
             {currentAgent && (
               <button
                 onClick={handleCreateConversation}
@@ -199,7 +199,7 @@ export function ConversationList({ collapsed = false }: ConversationListProps) {
                   "transition-colors duration-150"
                 )}
               >
-                开始新对话
+                Start a new chat
               </button>
             )}
           </div>

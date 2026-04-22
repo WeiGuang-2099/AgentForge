@@ -103,7 +103,7 @@ export function Sidebar({ defaultCollapsed = false }: SidebarProps) {
               "hover:bg-gray-100 dark:hover:bg-gray-800",
               "transition-colors duration-150"
             )}
-            title={isCollapsed ? "展开侧边栏" : "收起侧边栏"}
+            title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
           >
             <svg
               className="w-5 h-5"
@@ -138,7 +138,7 @@ export function Sidebar({ defaultCollapsed = false }: SidebarProps) {
               "transition-colors duration-150"
             )}
           >
-            <span>Agent 选择</span>
+            <span>Agent Selection</span>
             <svg
               className={cn(
                 "w-4 h-4 transition-transform duration-200",
@@ -204,7 +204,7 @@ export function Sidebar({ defaultCollapsed = false }: SidebarProps) {
                 d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"
               />
             </svg>
-            <span className="text-sm font-medium">工作流</span>
+            <span className="text-sm font-medium">Workflows</span>
           </Link>
           <Link
             href="/dashboard"
@@ -228,7 +228,7 @@ export function Sidebar({ defaultCollapsed = false }: SidebarProps) {
                 d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
               />
             </svg>
-            <span className="text-sm font-medium">仪表板</span>
+            <span className="text-sm font-medium">Dashboard</span>
           </Link>
           <Link
             href="/marketplace"
@@ -252,7 +252,7 @@ export function Sidebar({ defaultCollapsed = false }: SidebarProps) {
                 d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
               />
             </svg>
-            <span className="text-sm font-medium">模板市场</span>
+            <span className="text-sm font-medium">Template Marketplace</span>
           </Link>
           <Link
             href="/settings"
@@ -282,7 +282,7 @@ export function Sidebar({ defaultCollapsed = false }: SidebarProps) {
                 d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
               />
             </svg>
-            <span className="text-sm font-medium">设置</span>
+            <span className="text-sm font-medium">Settings</span>
           </Link>
         </div>
       </aside>
@@ -300,7 +300,7 @@ export function Sidebar({ defaultCollapsed = false }: SidebarProps) {
             "shadow-md hover:shadow-lg",
             "transition-all duration-150"
           )}
-          title="展开侧边栏"
+          title="Expand sidebar"
         >
           <svg
             className="w-5 h-5"
@@ -331,7 +331,7 @@ export function Sidebar({ defaultCollapsed = false }: SidebarProps) {
             "shadow-md",
             "transition-all duration-150"
           )}
-          title="展开菜单"
+          title="Open menu"
         >
           <svg
             className="w-5 h-5"

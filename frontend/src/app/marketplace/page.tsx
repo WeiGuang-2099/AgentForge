@@ -24,10 +24,10 @@ export default function MarketplacePage() {
     try {
       setLoading(true);
       const res = await fetch("/api/marketplace/templates");
-      if (!res.ok) throw new Error("获取模板列表失败");
+      if (!res.ok) throw new Error("Failed to fetch templates");
       setTemplates(await res.json());
     } catch (err) {
-      setError(err instanceof Error ? err.message : "未知错误");
+      setError(err instanceof Error ? err.message : "Unknown error");
     } finally {
       setLoading(false);
     }
@@ -40,7 +40,7 @@ export default function MarketplacePage() {
   const handleExport = async (name: string) => {
     try {
       const res = await fetch(`/api/marketplace/templates/${encodeURIComponent(name)}/export`);
-      if (!res.ok) throw new Error("导出失败");
+      if (!res.ok) throw new Error("Export failed");
       const data = await res.json();
       
       // 下载 YAML 文件
@@ -52,10 +52,10 @@ export default function MarketplacePage() {
       a.click();
       URL.revokeObjectURL(url);
 
-      setMessage({ type: "success", text: `已导出模板 "${name}"` });
+      setMessage({ type: "success", text: `Exported template "${name}"` });
       setTimeout(() => setMessage(null), 3000);
     } catch (err) {
-      setMessage({ type: "error", text: err instanceof Error ? err.message : "导出失败" });
+      setMessage({ type: "error", text: err instanceof Error ? err.message : "Export failed" });
       setTimeout(() => setMessage(null), 3000);
     }
   };
@@ -76,7 +76,7 @@ export default function MarketplacePage() {
 
       if (!res.ok) {
         const data = await res.json();
-        throw new Error(data.detail || "导入失败");
+        throw new Error(data.detail || "Import failed");
       }
 
       const data = await res.json();
@@ -86,7 +86,7 @@ export default function MarketplacePage() {
       // 刷新模板列表
       await fetchTemplates();
     } catch (err) {
-      setMessage({ type: "error", text: err instanceof Error ? err.message : "导入失败" });
+      setMessage({ type: "error", text: err instanceof Error ? err.message : "Import failed" });
       setTimeout(() => setMessage(null), 3000);
     } finally {
       setImporting(false);
@@ -119,10 +119,10 @@ export default function MarketplacePage() {
                   d="M10 19l-7-7m0 0l7-7m-7 7h18"
                 />
               </svg>
-              <span>返回首页</span>
+              <span>Back to Home</span>
             </Link>
             <h1 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-              模板市场
+              Template Marketplace
             </h1>
             <button
               onClick={() => fileInputRef.current?.click()}
@@ -132,7 +132,7 @@ export default function MarketplacePage() {
               {importing ? (
                 <>
                   <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-                  <span>导入中...</span>
+                  <span>Importing...</span>
                 </>
               ) : (
                 <>
@@ -149,7 +149,7 @@ export default function MarketplacePage() {
                       d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
                     />
                   </svg>
-                  <span>导入模板</span>
+                  <span>Import Template</span>
                 </>
               )}
             </button>
@@ -196,7 +196,7 @@ export default function MarketplacePage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {templates.length === 0 ? (
               <div className="col-span-full text-center py-12 text-gray-500 dark:text-gray-400">
-                暂无模板，请导入模板文件
+                No templates yet. Please import a template file.
               </div>
             ) : (
               templates.map((template) => (
@@ -217,13 +217,13 @@ export default function MarketplacePage() {
                             : "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400"
                         }`}
                       >
-                        {template.is_team ? "团队" : "单人"}
+                        {template.is_team ? "Team" : "Single"}
                       </span>
                     </div>
 
                     {/* 描述 */}
                     <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-2">
-                      {template.description || "暂无描述"}
+                      {template.description || "No description"}
                     </p>
 
                     {/* 模型 */}
@@ -287,7 +287,7 @@ export default function MarketplacePage() {
                           d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
                         />
                       </svg>
-                      导出 YAML
+                      Export YAML
                     </button>
                   </div>
                 </div>

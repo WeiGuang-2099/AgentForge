@@ -39,12 +39,12 @@ export default function AuthPage() {
   const validateLogin = (): boolean => {
     const newErrors: FormErrors = {};
     if (!loginEmail.trim()) {
-      newErrors.email = "请输入邮箱";
+      newErrors.email = "Please enter your email";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(loginEmail)) {
-      newErrors.email = "请输入有效的邮箱地址";
+      newErrors.email = "Please enter a valid email address";
     }
     if (!loginPassword) {
-      newErrors.password = "请输入密码";
+      newErrors.password = "Please enter your password";
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -53,20 +53,20 @@ export default function AuthPage() {
   const validateRegister = (): boolean => {
     const newErrors: FormErrors = {};
     if (!registerName.trim()) {
-      newErrors.name = "请输入用户名";
+      newErrors.name = "Please enter your username";
     }
     if (!registerEmail.trim()) {
-      newErrors.email = "请输入邮箱";
+      newErrors.email = "Please enter your email";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(registerEmail)) {
-      newErrors.email = "请输入有效的邮箱地址";
+      newErrors.email = "Please enter a valid email address";
     }
     if (!registerPassword) {
-      newErrors.password = "请输入密码";
+      newErrors.password = "Please enter your password";
     } else if (registerPassword.length < 6) {
-      newErrors.password = "密码至少需要6个字符";
+      newErrors.password = "Password must be at least 6 characters";
     }
     if (registerPassword !== confirmPassword) {
-      newErrors.confirmPassword = "两次输入的密码不一致";
+      newErrors.confirmPassword = "Passwords do not match";
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -89,14 +89,14 @@ export default function AuthPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        setErrors({ general: data.detail || "登录失败" });
+        setErrors({ general: data.detail || "Login failed" });
         return;
       }
 
       setAuth(data.access_token, data.refresh_token, data.user);
       router.push("/");
     } catch (error) {
-      setErrors({ general: "网络错误，请稍后重试" });
+      setErrors({ general: "Network error, please try again later" });
     } finally {
       setLoading(false);
     }
@@ -123,14 +123,14 @@ export default function AuthPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        setErrors({ general: data.detail || "注册失败" });
+        setErrors({ general: data.detail || "Registration failed" });
         return;
       }
 
       setAuth(data.access_token, data.refresh_token, data.user);
       router.push("/");
     } catch (error) {
-      setErrors({ general: "网络错误，请稍后重试" });
+      setErrors({ general: "Network error, please try again later" });
     } finally {
       setLoading(false);
     }
@@ -175,7 +175,7 @@ export default function AuthPage() {
                   : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
               )}
             >
-              登录
+              Sign In
             </button>
             <button
               type="button"
@@ -187,7 +187,7 @@ export default function AuthPage() {
                   : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
               )}
             >
-              注册
+              Sign Up
             </button>
           </div>
 
@@ -203,7 +203,7 @@ export default function AuthPage() {
             <form onSubmit={handleLogin} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                  邮箱
+                  Email
                 </label>
                 <input
                   type="email"
@@ -229,7 +229,7 @@ export default function AuthPage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                  密码
+                  Password
                 </label>
                 <input
                   type="password"
@@ -265,7 +265,7 @@ export default function AuthPage() {
                   "transition-colors"
                 )}
               >
-                {loading ? "登录中..." : "登录"}
+                {loading ? "Signing in..." : "Sign In"}
               </button>
             </form>
           )}
@@ -275,13 +275,13 @@ export default function AuthPage() {
             <form onSubmit={handleRegister} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                  用户名
+                  Username
                 </label>
                 <input
                   type="text"
                   value={registerName}
                   onChange={(e) => setRegisterName(e.target.value)}
-                  placeholder="请输入用户名"
+                  placeholder="Enter your username"
                   className={cn(
                     "w-full px-4 py-2.5 rounded-lg border",
                     "bg-white dark:bg-gray-800",
@@ -301,7 +301,7 @@ export default function AuthPage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                  邮箱
+                  Email
                 </label>
                 <input
                   type="email"
@@ -327,13 +327,13 @@ export default function AuthPage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                  密码
+                  Password
                 </label>
                 <input
                   type="password"
                   value={registerPassword}
                   onChange={(e) => setRegisterPassword(e.target.value)}
-                  placeholder="至少6个字符"
+                  placeholder="At least 6 characters"
                   className={cn(
                     "w-full px-4 py-2.5 rounded-lg border",
                     "bg-white dark:bg-gray-800",
@@ -353,13 +353,13 @@ export default function AuthPage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                  确认密码
+                  Confirm Password
                 </label>
                 <input
                   type="password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="再次输入密码"
+                  placeholder="Re-enter your password"
                   className={cn(
                     "w-full px-4 py-2.5 rounded-lg border",
                     "bg-white dark:bg-gray-800",
@@ -389,7 +389,7 @@ export default function AuthPage() {
                   "transition-colors"
                 )}
               >
-                {loading ? "注册中..." : "注册"}
+                {loading ? "Signing up..." : "Sign Up"}
               </button>
             </form>
           )}
@@ -400,7 +400,7 @@ export default function AuthPage() {
               href="/"
               className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
             >
-              返回首页
+              Back to Home
             </Link>
           </div>
         </div>

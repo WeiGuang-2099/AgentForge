@@ -146,7 +146,7 @@ export function ChatWindow() {
         }
       } catch (err) {
         console.error("流式聊天错误:", err);
-        setError(err instanceof Error ? err.message : "发送消息失败");
+        setError(err instanceof Error ? err.message : "Failed to send message");
       } finally {
         setStreaming(false);
       }
@@ -169,7 +169,7 @@ export function ChatWindow() {
         <div className="text-center">
           <div className="text-6xl mb-4 opacity-20">🤖</div>
           <p className="text-gray-400 dark:text-gray-500 text-lg">
-            请先选择一个 Agent
+            Please select an Agent first
           </p>
         </div>
       </div>
@@ -203,13 +203,13 @@ export function ChatWindow() {
             {currentAgent.display_name}
           </h2>
           <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
-            {currentAgent.description || `模型: ${currentAgent.model}`}
+            {currentAgent.description || `Model: ${currentAgent.model}`}
           </p>
         </div>
         {/* Agent 状态指示 */}
         <div className="flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-          <span className="text-xs text-gray-500 dark:text-gray-400">在线</span>
+          <span className="text-xs text-gray-500 dark:text-gray-400">Online</span>
         </div>
       </div>
 
@@ -236,7 +236,7 @@ export function ChatWindow() {
               "text-sm"
             )}
           >
-            <span className="font-medium">错误：</span>
+            <span className="font-medium">Error: </span>
             {error}
             <button
               onClick={() => setError(null)}
@@ -254,7 +254,7 @@ export function ChatWindow() {
         <ChatInput
           onSend={handleSend}
           disabled={isStreaming}
-          placeholder={`向 ${currentAgent.display_name} 发送消息...`}
+          placeholder={`Message ${currentAgent.display_name}...`}
         />
       </div>
     </div>

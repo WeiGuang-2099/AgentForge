@@ -94,7 +94,7 @@ function AgentCard({ agent, isSelected, onSelect }: AgentCardProps) {
 
           {/* Agent 描述 */}
           <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-2 mt-0.5">
-            {agent.description || "暂无描述"}
+            {agent.description || "No description"}
           </p>
 
           {/* 工具数量标签 */}
@@ -106,7 +106,7 @@ function AgentCard({ agent, isSelected, onSelect }: AgentCardProps) {
                 "text-gray-600 dark:text-gray-400"
               )}
             >
-              🛠 {agent.tools.length} 工具
+              🛠 {agent.tools.length} tools
             </span>
           )}
         </div>
@@ -164,7 +164,7 @@ export function AgentSelector({ collapsed = false }: AgentSelectorProps) {
   return (
     <div className="px-3 py-2">
       <h3 className="px-1 mb-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-        选择 Agent
+        Select Agent
       </h3>
 
       {/* Agent 卡片网格 */}
@@ -191,7 +191,7 @@ export function AgentSelector({ collapsed = false }: AgentSelectorProps) {
           // 空状态
           <div className="col-span-2 py-8 text-center text-gray-400 dark:text-gray-500">
             <div className="text-3xl mb-2">🤖</div>
-            <p className="text-sm">暂无可用 Agent</p>
+            <p className="text-sm">No agents available</p>
           </div>
         )}
       </div>
