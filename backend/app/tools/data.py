@@ -71,7 +71,7 @@ def safe_eval(expression: str) -> float:
     expression_lower = expression.lower()
     for d in dangerous:
         if d in expression_lower:
-            raise ValueError(f"不允许使用 '{d}'")
+            raise ValueError(f"Not allowed: '{d}'")
     
     # 使用 compile + eval 并限制命名空间
     code = compile(expression, "<calculator>", "eval")
@@ -87,7 +87,7 @@ class CalculatorTool(BaseTool):
     
     @property
     def description(self) -> str:
-        return "安全的数学计算工具。支持基础算术、三角函数、对数等。例如: '2 + 3 * 4', 'sqrt(16)', 'sin(pi/2)'"
+        return "Safe math calculator. Supports basic arithmetic, trigonometry, logarithms, etc. Examples: '2 + 3 * 4', 'sqrt(16)', 'sin(pi/2)'"
     
     @property
     def parameters(self) -> list[ToolParameter]:
@@ -95,7 +95,7 @@ class CalculatorTool(BaseTool):
             ToolParameter(
                 name="expression",
                 type="string",
-                description="数学表达式（如 '2 + 3 * 4', 'sqrt(16)', 'sin(pi/2)', 'log(100)'）",
+                description="Math expression (e.g., '2 + 3 * 4', 'sqrt(16)', 'sin(pi/2)', 'log(100)')",
                 required=True
             ),
         ]
@@ -116,7 +116,7 @@ class CalculatorTool(BaseTool):
             return ToolResult(
                 success=False,
                 output="",
-                error="缺少必需参数: expression"
+                error="Missing required parameter: expression"
             )
         
         try:
@@ -144,20 +144,20 @@ class CalculatorTool(BaseTool):
             return ToolResult(
                 success=False,
                 output="",
-                error=f"表达式语法错误: {e}"
+                error=f"Expression syntax error: {e}"
             )
         except (ZeroDivisionError, OverflowError, ArithmeticError) as e:
             return ToolResult(
                 success=False,
                 output="",
-                error=f"计算错误: {e}"
+                error=f"Calculation error: {e}"
             )
         except Exception as e:
             logger.error(f"计算失败: {expression}, 错误: {e}")
             return ToolResult(
                 success=False,
                 output="",
-                error=f"计算失败: {e}"
+                error=f"Calculation failed: {e}"
             )
 
 
@@ -170,7 +170,7 @@ class DataAnalyzerTool(BaseTool):
     
     @property
     def description(self) -> str:
-        return "分析 CSV 数据文件。支持统计描述、分组聚合、数据筛选等。"
+        return "Analyze CSV data files. Supports statistical summaries, groupby aggregation, data filtering, and more."
     
     @property
     def parameters(self) -> list[ToolParameter]:
@@ -216,14 +216,14 @@ class DataAnalyzerTool(BaseTool):
             return ToolResult(
                 success=False,
                 output="",
-                error="缺少必需参数: file_path"
+                error="Missing required parameter: file_path"
             )
         
         if not operation:
             return ToolResult(
                 success=False,
                 output="",
-                error="缺少必需参数: operation"
+                error="Missing required parameter: operation"
             )
         
         # 解析参数
@@ -235,7 +235,7 @@ class DataAnalyzerTool(BaseTool):
                 return ToolResult(
                     success=False,
                     output="",
-                    error=f"params 参数不是有效的 JSON: {e}"
+                    error=f"params is not valid JSON: {e}"
                 )
         
         try:
@@ -247,7 +247,7 @@ class DataAnalyzerTool(BaseTool):
                 return ToolResult(
                     success=False,
                     output="",
-                    error=f"文件不存在: {file_path}"
+                    error=f"File not found: {file_path}"
                 )
             
             # 读取 CSV
@@ -272,14 +272,14 @@ class DataAnalyzerTool(BaseTool):
                     return ToolResult(
                         success=False,
                         output="",
-                        error="groupby 操作需要 'by' 参数指定分组列"
+                        error="groupby operation requires 'by' parameter for column"
                     )
                 
                 if by not in df.columns:
                     return ToolResult(
                         success=False,
                         output="",
-                        error=f"列 '{by}' 不存在。可用列: {list(df.columns)}"
+                        error=f"Column '{by}' does not exist. Available columns: {list(df.columns)}"
                     )
                 
                 # 仅对数值列进行聚合
@@ -288,7 +288,7 @@ class DataAnalyzerTool(BaseTool):
                     return ToolResult(
                         success=False,
                         output="",
-                        error="没有可用于聚合的数值列"
+                        error="No numeric columns available for aggregation"
                     )
                 
                 grouped = df.groupby(by)[numeric_df.columns.tolist()].agg(agg)
@@ -303,21 +303,21 @@ class DataAnalyzerTool(BaseTool):
                     return ToolResult(
                         success=False,
                         output="",
-                        error="filter 操作需要 'column' 参数"
+                        error="filter operation requires 'column' parameter"
                     )
                 
                 if value is None:
                     return ToolResult(
                         success=False,
                         output="",
-                        error="filter 操作需要 'value' 参数"
+                        error="filter operation requires 'value' parameter"
                     )
                 
                 if column not in df.columns:
                     return ToolResult(
                         success=False,
                         output="",
-                        error=f"列 '{column}' 不存在。可用列: {list(df.columns)}"
+                        error=f"Column '{column}' does not exist. Available columns: {list(df.columns)}"
                     )
                 
                 # 根据操作符筛选
@@ -339,7 +339,7 @@ class DataAnalyzerTool(BaseTool):
                     return ToolResult(
                         success=False,
                         output="",
-                        error=f"不支持的操作符: {op}。支持: ==, !=, >, >=, <, <=, contains"
+                        error=f"Unsupported operator: {op}。Supported: ==, !=, >, >=, <, <=, contains"
                     )
                 
                 result = f"筛选结果 ({len(filtered)} 行):\n{filtered.to_string()}"

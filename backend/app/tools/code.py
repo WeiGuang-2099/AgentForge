@@ -23,7 +23,7 @@ class PythonReplTool(BaseTool):
     
     @property
     def description(self) -> str:
-        return "执行 Python 代码并返回输出结果。可用于数据处理、数学计算、文件操作等。代码会在安全的沙箱环境中运行。"
+        return "Execute Python code and return the output. Useful for data processing, math calculations, file operations, etc. Code runs in a secure sandbox."
     
     @property
     def parameters(self) -> list[ToolParameter]:
@@ -31,7 +31,7 @@ class PythonReplTool(BaseTool):
             ToolParameter(
                 name="code",
                 type="string",
-                description="要执行的 Python 代码",
+                description="Python code to execute",
                 required=True,
             ),
         ]
@@ -50,11 +50,11 @@ class PythonReplTool(BaseTool):
         
         # 检查功能开关
         if not settings.ENABLE_CODE_EXECUTION:
-            return ToolResult(success=False, output="", error="代码执行功能已禁用")
+            return ToolResult(success=False, output="", error="Code execution is disabled")
         
         # 验证代码参数
         if not code or not code.strip():
-            return ToolResult(success=False, output="", error="代码不能为空")
+            return ToolResult(success=False, output="", error="Code cannot be empty")
         
         # 创建临时文件
         tmp_file = None
@@ -90,7 +90,7 @@ class PythonReplTool(BaseTool):
                 process.kill()
                 await process.wait()
                 return ToolResult(
-                    success=False, output="", error="代码执行超时（30秒限制）"
+                    success=False, output="", error="Code execution timed out (30 second limit)"
                 )
             
             # 解码输出
@@ -102,17 +102,17 @@ class PythonReplTool(BaseTool):
                 output = stdout_str
                 if stderr_str:
                     output += f"\n[stderr]: {stderr_str}"
-                return ToolResult(success=True, output=output or "(无输出)")
+                return ToolResult(success=True, output=output or "(No output)")
             else:
                 # 执行失败
                 return ToolResult(
                     success=False,
                     output=stdout_str,
-                    error=stderr_str or f"进程退出码: {process.returncode}",
+                    error=stderr_str or f"Process exit code: {process.returncode}",
                 )
                 
         except Exception as e:
-            return ToolResult(success=False, output="", error=f"执行异常: {str(e)}")
+            return ToolResult(success=False, output="", error=f"Execution error: {str(e)}")
         finally:
             # 清理临时文件
             if tmp_file and os.path.exists(tmp_file):

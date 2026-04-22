@@ -40,7 +40,7 @@ class ToolRunner:
             return ToolResult(
                 success=False,
                 output="",
-                error=f"工具 '{tool_name}' 未找到",
+                error=f"Tool '{tool_name}' not found",
             )
         
         try:
@@ -53,14 +53,14 @@ class ToolRunner:
             return ToolResult(
                 success=False,
                 output="",
-                error=f"工具 '{tool_name}' 执行超时（{self.timeout}秒）",
+                error=f"Tool '{tool_name}' execution timed out ({self.timeout}s)",
             )
         except Exception as e:
-            logger.error(f"工具 '{tool_name}' 执行异常: {e}")
+            logger.error(f"Tool '{tool_name}' execution error: {e}")
             return ToolResult(
                 success=False,
                 output="",
-                error=f"工具执行异常: {str(e)}",
+                error=f"Tool execution error: {str(e)}",
             )
     
     async def process_tool_calls(self, tool_calls: list) -> list[dict]:
@@ -92,7 +92,7 @@ class ToolRunner:
             result = await self.execute_tool_call(tool_name, arguments)
             
             # 构建 tool 消息
-            content = result.output if result.success else f"错误: {result.error}"
+            content = result.output if result.success else f"Error: {result.error}"
             tool_messages.append({
                 "role": "tool",
                 "tool_call_id": tool_call.id,
@@ -100,6 +100,6 @@ class ToolRunner:
                 "content": content,
             })
             
-            logger.info(f"工具 '{tool_name}' 执行{'成功' if result.success else '失败'}")
+            logger.info(f"Tool '{tool_name}' executed {'successfully' if result.success else 'failed'}")
         
         return tool_messages
