@@ -51,6 +51,8 @@ async def save_api_key(req: ApiKeyCreateRequest, user_id: str = Depends(get_curr
         existing.key_hint = get_key_hint(req.api_key)
         existing.is_valid = True
         await db.commit()
+        from app.utils.audit import log_audit
+        await log_audit(db, action="save_api_key", user_id=user_id, resource_type="api_key", detail=f"Saved {req.provider} key")
         return ApiKeyResponse(id=str(existing.id), provider=existing.provider, key_hint=existing.key_hint, is_valid=True)
     
     key = UserApiKey(
@@ -62,6 +64,8 @@ async def save_api_key(req: ApiKeyCreateRequest, user_id: str = Depends(get_curr
     db.add(key)
     await db.commit()
     await db.refresh(key)
+    from app.utils.audit import log_audit
+    await log_audit(db, action="save_api_key", user_id=user_id, resource_type="api_key", detail=f"Saved {req.provider} key")
     return ApiKeyResponse(id=str(key.id), provider=key.provider, key_hint=key.key_hint, is_valid=key.is_valid)
 
 
@@ -73,6 +77,8 @@ async def delete_api_key(key_id: str, user_id: str = Depends(get_current_user), 
         raise HTTPException(status_code=404, detail="API Key 未找到")
     await db.delete(key)
     await db.commit()
+    from app.utils.audit import log_audit
+    await log_audit(db, action="delete_api_key", user_id=user_id, resource_type="api_key", detail=f"Deleted key {key_id}")
     return {"message": "已删除"}
 
 
