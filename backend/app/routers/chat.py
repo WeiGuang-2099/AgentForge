@@ -1,16 +1,19 @@
 """对话路由 - with persistence"""
 import json
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Request
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 from typing import Optional
 from sqlalchemy import select, desc
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.config import settings
+from app.main import limiter
 from app.models.database import get_db, AsyncSessionLocal
 from app.models.conversation import Conversation
 from app.models.message import Message
 from app.utils.usage import record_usage
+from app.core.auth import get_current_user_optional
 
 router = APIRouter()
 
@@ -92,7 +95,8 @@ async def _save_message(
 # --- Routes ---
 
 @router.post("/chat")
-async def chat(req: ChatRequest, db: AsyncSession = Depends(get_db)):
+@limiter.limit(f"{settings.RATE_LIMIT_PER_MINUTE}/minute")
+async def chat(request: Request, req: ChatRequest, db: AsyncSession = Depends(get_db), current_user = Depends(get_current_user_optional)):
     """Send message (non-streaming) with persistence."""
     from app.main import get_engine
     from app.core.agent import AgentNotFoundError
@@ -120,6 +124,7 @@ async def chat(req: ChatRequest, db: AsyncSession = Depends(get_db)):
             agent_name=req.agent_name,
             model=response.model,
             usage=response.usage,
+            user_id=current_user if current_user else None,
         )
 
         return ChatResponse(
@@ -136,7 +141,8 @@ async def chat(req: ChatRequest, db: AsyncSession = Depends(get_db)):
 
 
 @router.post("/chat/stream")
-async def chat_stream(req: ChatRequest, db: AsyncSession = Depends(get_db)):
+@limiter.limit(f"{settings.RATE_LIMIT_PER_MINUTE}/minute")
+async def chat_stream(request: Request, req: ChatRequest, db: AsyncSession = Depends(get_db), current_user = Depends(get_current_user_optional)):
     """Send message (streaming SSE) with persistence."""
     from app.main import get_engine
     from app.core.agent import AgentNotFoundError
@@ -193,6 +199,7 @@ async def list_conversations(
     limit: int = 50,
     offset: int = 0,
     db: AsyncSession = Depends(get_db),
+    current_user = Depends(get_current_user_optional),
 ):
     """List conversations from database."""
     query = select(Conversation).order_by(desc(Conversation.updated_at))
@@ -218,6 +225,7 @@ async def list_conversations(
 async def get_conversation_messages(
     conversation_id: str,
     db: AsyncSession = Depends(get_db),
+    current_user = Depends(get_current_user_optional),
 ):
     """Get messages for a conversation from database."""
     result = await db.execute(
@@ -247,6 +255,7 @@ async def get_conversation_messages(
 async def delete_conversation(
     conversation_id: str,
     db: AsyncSession = Depends(get_db),
+    current_user = Depends(get_current_user_optional),
 ):
     """Delete a conversation and its messages."""
     result = await db.execute(
