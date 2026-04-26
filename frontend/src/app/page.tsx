@@ -2,15 +2,25 @@
 
 import { useEffect } from "react";
 import { useAgentStore } from "@/stores/agentStore";
+import { useChatStore } from "@/stores/chatStore";
+import { useAuthStore } from "@/stores/authStore";
 import { ChatWindow } from "@/components/chat/ChatWindow";
 import { Sidebar } from "@/components/common/Sidebar";
 
 export default function Home() {
   const { currentAgent, fetchAgents } = useAgentStore();
+  const loadConversations = useChatStore((s) => s.loadConversations);
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 
   useEffect(() => {
     fetchAgents();
   }, [fetchAgents]);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      loadConversations();
+    }
+  }, [isAuthenticated, loadConversations]);
 
   return (
     <>

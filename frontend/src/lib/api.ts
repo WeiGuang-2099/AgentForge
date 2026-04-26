@@ -1,5 +1,6 @@
 import axios from "axios";
 import type { Agent, ChatRequest, ChatResponse, StreamEvent, WorkflowInfo, WorkflowEvent } from "@/types";
+import { useAuthStore } from "@/stores/authStore";
 
 const apiClient = axios.create({
   baseURL: "/api",
@@ -8,6 +9,32 @@ const apiClient = axios.create({
     "Content-Type": "application/json",
   },
 });
+
+// Add request interceptor for auth token
+apiClient.interceptors.request.use((config) => {
+  // Access zustand store outside React components
+  const token = useAuthStore.getState().accessToken;
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+// Add response interceptor for 401 handling
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      // Clear auth state and let the UI handle redirect
+      useAuthStore.getState().logout();
+      // Only redirect if in browser
+      if (typeof window !== 'undefined') {
+        window.location.href = '/auth';
+      }
+    }
+    return Promise.reject(error);
+  }
+);
 
 /** Agent API */
 export const agentApi = {
@@ -27,9 +54,14 @@ export const chatApi = {
 export async function* streamChat(
   data: ChatRequest
 ): AsyncGenerator<StreamEvent> {
+  const token = useAuthStore.getState().accessToken;
+  const chatHeaders: Record<string, string> = { "Content-Type": "application/json" };
+  if (token) {
+    chatHeaders["Authorization"] = `Bearer ${token}`;
+  }
   const response = await fetch("/api/chat/stream", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: chatHeaders,
     body: JSON.stringify(data),
   });
 
@@ -108,9 +140,14 @@ export async function* streamWorkflow(
   workflowName: string,
   task: string
 ): AsyncGenerator<WorkflowEvent> {
+  const wfToken = useAuthStore.getState().accessToken;
+  const wfHeaders: Record<string, string> = { "Content-Type": "application/json" };
+  if (wfToken) {
+    wfHeaders["Authorization"] = `Bearer ${wfToken}`;
+  }
   const response = await fetch("/api/workflows/execute/stream", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: wfHeaders,
     body: JSON.stringify({ workflow_name: workflowName, task }),
   });
 
