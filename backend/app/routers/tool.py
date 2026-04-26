@@ -1,8 +1,10 @@
 """工具管理路由"""
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel
 from typing import Optional
 
+from app.config import settings
+from app.main import limiter
 from app.tools.base import tool_registry
 
 router = APIRouter()
@@ -40,7 +42,8 @@ async def list_tools():
     ]
 
 @router.post("/tools/execute", response_model=ToolExecuteResponse)
-async def execute_tool(req: ToolExecuteRequest):
+@limiter.limit(f"{settings.RATE_LIMIT_PER_MINUTE}/minute")
+async def execute_tool(request: Request, req: ToolExecuteRequest):
     """手动触发工具执行（调试用）"""
     from app.core.tool_runner import ToolRunner
     runner = ToolRunner()

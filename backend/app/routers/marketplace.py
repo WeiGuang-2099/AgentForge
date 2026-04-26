@@ -1,9 +1,14 @@
 """模板市场路由"""
+import logging
 import os
 import yaml
-from fastapi import APIRouter, HTTPException, UploadFile, File
+from fastapi import APIRouter, HTTPException, UploadFile, File, Depends
 from pydantic import BaseModel
 from typing import Optional
+
+from app.core.auth import get_current_user_optional
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -24,8 +29,8 @@ class TemplateExportResponse(BaseModel):
     yaml_content: str
 
 
-@router.get("/marketplace/templates", response_model=list[TemplateInfo])
-async def list_templates():
+@router.get("/marketplace/templates")
+async def list_templates(limit: int = 50, offset: int = 0):
     """列出所有可用模板"""
     templates = []
     presets_dir = os.path.normpath(PRESETS_DIR)
@@ -46,8 +51,8 @@ async def list_templates():
                             tools=data.get("tools", []),
                             is_team=data.get("mode") == "team",
                         ))
-                except:
-                    pass
+                except Exception as e:
+                    logger.warning(f"Failed to load template {f}: {e}")
     
     # 团队模板
     team_dir = os.path.join(presets_dir, "team")
@@ -66,10 +71,10 @@ async def list_templates():
                             tools=[],
                             is_team=True,
                         ))
-                except:
-                    pass
+                except Exception as e:
+                    logger.warning(f"Failed to load template {f}: {e}")
     
-    return templates
+    return {"templates": templates[offset:offset+limit], "total": len(templates)}
 
 
 @router.get("/marketplace/templates/{name}/export", response_model=TemplateExportResponse)
@@ -94,19 +99,34 @@ async def export_template(name: str):
 
 
 @router.post("/marketplace/templates/import")
-async def import_template(file: UploadFile = File(...)):
+async def import_template(file: UploadFile = File(...), current_user = Depends(get_current_user_optional)):
     """导入模板 YAML 文件"""
     if not file.filename.endswith((".yaml", ".yml")):
         raise HTTPException(status_code=400, detail="Only YAML files are supported")
     
     content = await file.read()
+
+    # File size validation: reject uploads over 1MB
+    if len(content) > 1_048_576:
+        raise HTTPException(status_code=400, detail="File size exceeds 1MB limit")
+
     try:
         data = yaml.safe_load(content.decode("utf-8"))
-    except:
+    except Exception:
         raise HTTPException(status_code=400, detail="Invalid YAML format")
     
     if not data or "name" not in data:
         raise HTTPException(status_code=400, detail="Template must contain a 'name' field")
+
+    # Validate that 'name' is a string
+    if not isinstance(data["name"], str):
+        raise HTTPException(status_code=400, detail="Template 'name' must be a string")
+
+    # Warn about missing optional fields
+    if "model" not in data:
+        logger.warning("Imported template '%s' is missing optional field 'model'", data["name"])
+    if "system_prompt" not in data:
+        logger.warning("Imported template '%s' is missing optional field 'system_prompt'", data["name"])
     
     # 保存到 presets 目录
     presets_dir = os.path.normpath(PRESETS_DIR)

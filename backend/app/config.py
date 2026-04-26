@@ -1,4 +1,5 @@
 """Application configuration."""
+from pydantic import model_validator
 from pydantic_settings import BaseSettings
 from typing import Optional
 
@@ -44,10 +45,29 @@ class Settings(BaseSettings):
     ENABLE_CODE_EXECUTION: bool = True
     ENABLE_WEB_SEARCH: bool = True
     ENABLE_FILE_OPS: bool = True
+
+    # Memory settings
+    ENABLE_MEMORY: bool = True
+    MEMORY_SHORT_TERM_WINDOW: int = 20
+    MEMORY_LONG_TERM_TOP_K: int = 5
     
+    # CORS 配置
+    CORS_ORIGINS: str = "http://localhost:3000,http://localhost:8000"
+
+    # 速率限制
+    RATE_LIMIT_PER_MINUTE: int = 30
+
     # 语言和地区
     DEFAULT_LANGUAGE: str = "zh-CN"
     TIMEZONE: str = "Asia/Shanghai"
+
+    @model_validator(mode='after')
+    def _check_secret_key(self):
+        if self.APP_SECRET_KEY == "change-me-in-production" and self.APP_ENV == "production":
+            raise ValueError(
+                "APP_SECRET_KEY must be changed from its default value in production"
+            )
+        return self
 
     class Config:
         env_file = ".env"

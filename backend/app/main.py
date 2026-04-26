@@ -2,21 +2,35 @@
 import logging
 import os
 from contextlib import asynccontextmanager
+from typing import Optional
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
 
 from app.config import settings
 from app.core.agent import AgentEngine
+from app.core.memory import MemoryManager
 from app.core.workflow import WorkflowEngine
 from app.plugins import PluginManager
-from app.routers import agent, apikey, audit, auth, chat, marketplace, tool, usage, ws, workflow, plugin
 from app.tools import register_all_tools
 from app.models.database import init_db, close_db
+
+# Rate limiter (defined before router imports so routers can import it)
+limiter = Limiter(key_func=get_remote_address)
+
+from app.tools.base import tool_registry
+
+from app.routers import agent, apikey, audit, auth, chat, marketplace, tool, usage, ws, workflow, plugin
 
 # 配置日志
 logging.basicConfig(level=logging.DEBUG if settings.APP_DEBUG else logging.INFO)
 logger = logging.getLogger(__name__)
+
+# 全局 MemoryManager 实例
+memory_manager: Optional[MemoryManager] = None
 
 # 全局 AgentEngine 实例
 engine = AgentEngine()
@@ -34,6 +48,18 @@ async def lifespan(app: FastAPI):
     # 注册所有工具
     register_all_tools()
     logger.info("All tools registered")
+    # Enforce feature flags
+    if not settings.ENABLE_CODE_EXECUTION:
+        tool_registry.unregister("python_repl")
+        logger.info("Code execution disabled by feature flag")
+    if not settings.ENABLE_WEB_SEARCH:
+        tool_registry.unregister("web_search")
+        tool_registry.unregister("web_scrape")
+        logger.info("Web search disabled by feature flag")
+    if not settings.ENABLE_FILE_OPS:
+        tool_registry.unregister("read_file")
+        tool_registry.unregister("write_file")
+        logger.info("File operations disabled by feature flag")
     # 初始化 Agent 引擎（加载预置模板）
     await engine.initialize()
     logger.info(f"Loaded {len(engine.list_agents())} agents")
@@ -45,6 +71,17 @@ async def lifespan(app: FastAPI):
     plugin_count = plugin_manager.discover_plugins()
     active_count = await plugin_manager.activate_all()
     logger.info(f"Discovered {plugin_count} plugins, activated {active_count}")
+    # 初始化记忆系统
+    global memory_manager
+    memory_manager = MemoryManager(
+        short_term_window=settings.MEMORY_SHORT_TERM_WINDOW,
+        long_term_top_k=settings.MEMORY_LONG_TERM_TOP_K,
+        persist_directory=settings.CHROMA_PERSIST_DIR,
+        enabled=settings.ENABLE_MEMORY
+    )
+    memory_manager.initialize()
+    engine.memory_manager = memory_manager
+    logger.info("Memory system initialized")
     # 初始化数据库表
     await init_db()
     logger.info("Database initialized")
@@ -60,10 +97,13 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
 # CORS 中间件
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # 开发环境允许所有来源
+    allow_origins=[origin.strip() for origin in settings.CORS_ORIGINS.split(",")],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -102,3 +142,7 @@ def get_workflow_engine() -> WorkflowEngine:
 def get_plugin_manager() -> PluginManager:
     """获取全局 PluginManager 实例（供路由使用）"""
     return plugin_manager
+
+def get_memory_manager() -> Optional[MemoryManager]:
+    """获取全局 MemoryManager 实例（供路由使用）"""
+    return memory_manager

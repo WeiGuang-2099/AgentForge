@@ -1,7 +1,12 @@
 """插件管理路由"""
-from fastapi import APIRouter, HTTPException
+import logging
+from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel
 from typing import Optional
+
+from app.core.auth import get_current_user
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -30,21 +35,54 @@ async def list_plugins():
     ]
 
 
-@router.post("/plugins/{name}/activate")
-async def activate_plugin(name: str):
+@router.get("/plugins/{name}")
+async def get_plugin(name: str):
     from app.main import get_plugin_manager
     manager = get_plugin_manager()
-    success = await manager.activate_plugin(name)
-    if not success:
-        raise HTTPException(status_code=404, detail=f"Plugin '{name}' not found or activation failed")
+    plugins = manager.list_plugins()
+    plugin_info = None
+    for p in plugins:
+        if getattr(p.metadata, "name", None) == name:
+            plugin_info = p
+            break
+    if not plugin_info:
+        raise HTTPException(status_code=404, detail=f"Plugin '{name}' not found")
+    return PluginInfoResponse(
+        name=plugin_info.metadata.name,
+        version=plugin_info.metadata.version,
+        description=plugin_info.metadata.description,
+        author=plugin_info.metadata.author,
+        is_active=plugin_info.is_active,
+    )
+
+
+@router.post("/plugins/{name}/activate")
+async def activate_plugin(name: str, current_user = Depends(get_current_user)):
+    from app.main import get_plugin_manager
+    manager = get_plugin_manager()
+    try:
+        success = await manager.activate_plugin(name)
+        if not success:
+            raise HTTPException(status_code=404, detail=f"Plugin '{name}' not found or activation failed")
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Failed to activate plugin '{name}': {e}")
+        raise HTTPException(status_code=500, detail=str(e))
     return {"message": f"Plugin '{name}' activated"}
 
 
 @router.post("/plugins/{name}/deactivate")
-async def deactivate_plugin(name: str):
+async def deactivate_plugin(name: str, current_user = Depends(get_current_user)):
     from app.main import get_plugin_manager
     manager = get_plugin_manager()
-    success = await manager.deactivate_plugin(name)
-    if not success:
-        raise HTTPException(status_code=404, detail=f"Plugin '{name}' not found or deactivation failed")
+    try:
+        success = await manager.deactivate_plugin(name)
+        if not success:
+            raise HTTPException(status_code=404, detail=f"Plugin '{name}' not found or deactivation failed")
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Failed to deactivate plugin '{name}': {e}")
+        raise HTTPException(status_code=500, detail=str(e))
     return {"message": f"Plugin '{name}' deactivated"}

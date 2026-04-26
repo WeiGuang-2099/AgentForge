@@ -13,5 +13,5 @@ data:
   LOG_LEVEL: "INFO"
   CHROMA_HOST: "agentforge-chroma"
   CHROMA_PORT: "8000"
-  CORS_ORIGINS: "*"
+  CORS_ORIGINS: "https://agentforge.example.com"
   MAX_UPLOAD_SIZE: "52428800"

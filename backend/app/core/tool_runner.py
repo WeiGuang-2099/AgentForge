@@ -5,11 +5,21 @@ import logging
 from typing import Optional
 
 from app.tools.base import ToolRegistry, ToolResult, tool_registry
+from app.config import settings
 
 logger = logging.getLogger(__name__)
 
 # 工具执行超时（秒）
 DEFAULT_TIMEOUT = 30
+
+# Mapping of tools to their feature flags
+TOOL_FEATURE_FLAGS = {
+    "python_repl": "ENABLE_CODE_EXECUTION",
+    "web_search": "ENABLE_WEB_SEARCH",
+    "web_scrape": "ENABLE_WEB_SEARCH",
+    "read_file": "ENABLE_FILE_OPS",
+    "write_file": "ENABLE_FILE_OPS",
+}
 
 
 class ToolRunner:
@@ -41,6 +51,15 @@ class ToolRunner:
                 success=False,
                 output="",
                 error=f"Tool '{tool_name}' not found",
+            )
+        
+        # Check feature flag
+        flag_name = TOOL_FEATURE_FLAGS.get(tool_name)
+        if flag_name and not getattr(settings, flag_name, True):
+            return ToolResult(
+                success=False,
+                output="",
+                error=f"Tool '{tool_name}' is disabled by configuration",
             )
         
         try:

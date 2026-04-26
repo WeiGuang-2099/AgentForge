@@ -149,10 +149,11 @@ class AgentEngine:
     Agent 核心引擎 - 管理 Agent 生命周期和对话执行。
     """
     
-    def __init__(self):
+    def __init__(self, memory_manager=None):
         self.registry = AgentRegistry()
         self._llm_clients: dict[str, LLMClient] = {}  # 按模型缓存 LLM 客户端
         self.tool_runner = ToolRunner()  # 工具执行器
+        self.memory_manager = memory_manager
     
     async def initialize(self) -> None:
         """初始化引擎：加载预置 Agent"""
@@ -186,17 +187,19 @@ class AgentEngine:
     def _build_messages(
         self, 
         profile: AgentProfile, 
-        conversation_messages: list[dict]
+        conversation_messages: list[dict],
+        conversation_id: Optional[str] = None
     ) -> list[dict]:
         """
         构建发送给 LLM 的完整消息列表。
         
         将 system_prompt 作为第一条 system 消息，
-        然后拼接对话历史 messages。
+        然后注入记忆上下文，最后拼接对话历史 messages。
         
         Args:
             profile: Agent 配置
             conversation_messages: 对话消息列表
+            conversation_id: 对话 ID（用于记忆检索）
             
         Returns:
             完整的消息列表
@@ -209,6 +212,15 @@ class AgentEngine:
                 "role": "system",
                 "content": profile.system_prompt
             })
+        
+        # 注入记忆上下文（介于 system prompt 和对话历史之间）
+        if self.memory_manager and profile.memory:
+            query = conversation_messages[-1]["content"] if conversation_messages else ""
+            memory_context = self.memory_manager.get_relevant_context(
+                conversation_id=conversation_id or "default",
+                query=query
+            )
+            messages.extend(memory_context)
         
         # 追加用户对话消息
         messages.extend(conversation_messages)
@@ -254,8 +266,10 @@ class AgentEngine:
         if not profile:
             raise AgentNotFoundError(f"Agent '{agent_name}' not found")
 
+        conversation_id = kwargs.pop("conversation_id", None)
+
         llm_client = self._get_llm_client(profile.model, profile.api_base, profile.parameters)
-        full_messages = self._build_messages(profile, messages)
+        full_messages = self._build_messages(profile, messages, conversation_id=conversation_id)
         
         # 合并 profile.parameters 和 kwargs，kwargs 优先
         call_params = {**profile.parameters, **kwargs}
@@ -332,8 +346,10 @@ class AgentEngine:
             return
         
         # 无工具的 Agent，正常流式
+        conversation_id = kwargs.pop("conversation_id", None)
+
         llm_client = self._get_llm_client(profile.model, profile.api_base, profile.parameters)
-        full_messages = self._build_messages(profile, messages)
+        full_messages = self._build_messages(profile, messages, conversation_id=conversation_id)
         
         # 合并 profile.parameters 和 kwargs，kwargs 优先
         call_params = {**profile.parameters, **kwargs}
