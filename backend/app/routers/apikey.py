@@ -1,4 +1,5 @@
 """API Key 管理路由"""
+import re
 from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel
 from typing import Optional
@@ -11,6 +12,25 @@ from app.utils.crypto import encrypt, decrypt, get_key_hint
 from app.core.auth import get_current_user
 
 router = APIRouter()
+
+
+API_KEY_PATTERNS = {
+    "openai": r"^sk-[a-zA-Z0-9_-]{20,}$",
+    "anthropic": r"^sk-ant-[a-zA-Z0-9_-]{20,}$",
+    "google": r"^AI[a-zA-Z0-9_-]{35,}$",
+    "zhipuai": r"^[a-zA-Z0-9_-]{20,}\.[a-zA-Z0-9_-]{20,}$",
+    "deepseek": r"^sk-[a-zA-Z0-9]{20,}$",
+    "moonshot": r"^sk-[a-zA-Z0-9]{20,}$",
+}
+
+
+def validate_api_key_format(provider: str, key: str) -> bool:
+    """Validate API key format based on provider-specific patterns."""
+    pattern = API_KEY_PATTERNS.get(provider.lower())
+    if pattern:
+        return bool(re.match(pattern, key))
+    # For unknown providers, require minimum length of 20
+    return len(key) >= 20
 
 
 class ApiKeyCreateRequest(BaseModel):
@@ -91,7 +111,13 @@ async def validate_api_key(key_id: str, user_id: str = Depends(get_current_user)
         raise HTTPException(status_code=404, detail="API Key not found")
     
     decrypted = decrypt(key.encrypted_key)
-    is_valid = len(decrypted) > 10  # 简单格式检查
+    is_valid = validate_api_key_format(key.provider, decrypted)
     key.is_valid = is_valid
     await db.commit()
-    return ApiKeyValidateResponse(provider=key.provider, is_valid=is_valid, message="Key format is valid" if is_valid else "Key format is invalid")
+    if is_valid:
+        return ApiKeyValidateResponse(provider=key.provider, is_valid=True, message="Key format is valid")
+    return ApiKeyValidateResponse(
+        provider=key.provider,
+        is_valid=False,
+        message=f"API key format does not match expected pattern for provider: {key.provider}",
+    )

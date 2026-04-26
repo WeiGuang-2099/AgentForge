@@ -35,12 +35,6 @@ def do_run_migrations(connection):
         context.run_migrations()
 
 
-def do_run_migrations(connection):
-    context.configure(connection=connection, target_metadata=target_metadata)
-    with context.begin_transaction():
-        context.run_migrations()
-
-
 async def run_async_migrations() -> None:
     connectable = create_async_engine(settings.DATABASE_URL)
     async with connectable.connect() as connection:

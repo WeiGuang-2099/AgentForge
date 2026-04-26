@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.database import get_db
 from app.models.usage import UsageRecord
+from app.core.auth import get_current_user
 
 router = APIRouter()
 
@@ -31,7 +32,7 @@ class UsageByModel(BaseModel):
 
 
 @router.get("/usage/summary", response_model=UsageSummary)
-async def get_usage_summary(db: AsyncSession = Depends(get_db)):
+async def get_usage_summary(db: AsyncSession = Depends(get_db), current_user = Depends(get_current_user)):
     """获取总体使用量统计"""
     result = await db.execute(
         select(
@@ -51,7 +52,7 @@ async def get_usage_summary(db: AsyncSession = Depends(get_db)):
 
 
 @router.get("/usage/by-agent", response_model=list[UsageByAgent])
-async def get_usage_by_agent(db: AsyncSession = Depends(get_db)):
+async def get_usage_by_agent(db: AsyncSession = Depends(get_db), current_user = Depends(get_current_user)):
     """按 Agent 分组的使用量"""
     result = await db.execute(
         select(
@@ -64,7 +65,7 @@ async def get_usage_by_agent(db: AsyncSession = Depends(get_db)):
 
 
 @router.get("/usage/by-model", response_model=list[UsageByModel])
-async def get_usage_by_model(db: AsyncSession = Depends(get_db)):
+async def get_usage_by_model(db: AsyncSession = Depends(get_db), current_user = Depends(get_current_user)):
     """按模型分组的使用量"""
     result = await db.execute(
         select(
