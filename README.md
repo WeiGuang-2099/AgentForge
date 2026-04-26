@@ -63,7 +63,9 @@
 | 🤝 **多Agent协作** | 支持单Agent和多Agent团队协作模式 |
 | 🌐 **Web界面** | 现代化Web UI，支持实时对话和工作流可视化 |
 | 🔌 **工具生态** | 内置搜索、代码执行、文件处理等工具 |
-| 📦 **一键部署** | Docker支持，3秒启动完整服务 |
+| 🧠 **记忆系统** | 短期滑动窗口 + ChromaDB长期向量记忆，跨会话记忆 |
+| 🔒 **安全加固** | Rate limiting、CORS白名单、API Key格式校验、路由鉴权 |
+| 📦 **一键部署** | Docker多阶段构建、健康检查，生产级Gunicorn部署 |
 
 ---
 
@@ -101,15 +103,35 @@
 ### 3. 记忆系统
 
 ```
-短期记忆 (Session)          长期记忆 (Persistent)
-┌─────────────────┐         ┌─────────────────┐
-│ 当前对话上下文   │         │ 向量数据库存储   │
-│ 自动管理        │   →     │ 跨会话记忆      │
-│ 窗口滑动裁剪    │         │ 语义检索        │
-└─────────────────┘         └─────────────────┘
+短期记忆 (ShortTermMemory)      长期记忆 (LongTermMemory)
+┌─────────────────────┐          ┌─────────────────────┐
+│ 当前对话上下文       │          │ ChromaDB 向量存储    │
+│ 可配置滑动窗口       │    →     │ 跨会话持久记忆       │
+│ 自动裁剪旧消息       │          │ 语义相似度检索       │
+│ 支持查询和清空       │          │ 嵌入向量自动生成     │
+└─────────────────────┘          └─────────────────────┘
+              ↓                            ↓
+         ┌─────────────────────────────────────┐
+         │      MemoryManager (统一管理)        │
+         │  - add() / search() / get_context()  │
+         │  - 可通过 ENABLE_MEMORY 开关控制      │
+         │  - 配置窗口大小和检索 top_k           │
+         └─────────────────────────────────────┘
 ```
 
-### 4. 多模型支持
+### 4. 安全与生产就绪
+
+| 特性 | 说明 |
+|------|------|
+| Rate Limiting | 基于 SlowAPI 的按IP限流，工具执行接口默认30次/分钟 |
+| CORS 白名单 | 可配置的跨域来源，告别通配符 `*` |
+| API Key 校验 | 按Provider格式的Key验证（OpenAI/Anthropic/Google等）|
+| 路由鉴权 | Usage、Plugin、Marketplace 等路由统一鉴权 |
+| Feature Flags | `ENABLE_CODE_EXECUTION`、`ENABLE_WEB_SEARCH`、`ENABLE_FILE_OPS` 等工具开关 |
+| 生产部署 | Gunicorn + Uvicorn Worker 多进程部署，多阶段 Docker 构建 |
+| 健康检查 | Docker Compose 全服务健康检查，K8s 就绪 |
+
+### 5. 多模型支持
 
 通过 LiteLLM 统一接口，支持：
 
@@ -189,10 +211,13 @@
 ├── 框架: FastAPI
 ├── 语言: Python 3.10+
 ├── 异步: asyncio + uvicorn
+├── 生产部署: Gunicorn + Uvicorn Workers
 ├── 验证: Pydantic v2
 ├── LLM: LiteLLM (统一接口)
 ├── 向量库: ChromaDB
-└── ORM: SQLAlchemy 2.0
+├── ORM: SQLAlchemy 2.0
+├── 限流: SlowAPI
+└── 测试: pytest + httpx
 
 基础设施
 ├── 容器: Docker + Docker Compose
@@ -311,10 +336,19 @@ EMBEDDING_MODEL=text-embedding-3-small
 SERPER_API_KEY=your-serper-api-key
 BING_API_KEY=your-bing-api-key
 
+# ----- 安全配置 -----
+CORS_ORIGINS=http://localhost:3000,http://localhost:8000
+RATE_LIMIT_PER_MINUTE=30
+
 # ----- 功能开关 -----
 ENABLE_CODE_EXECUTION=true
 ENABLE_WEB_SEARCH=true
 ENABLE_FILE_OPS=true
+
+# ----- 记忆系统配置 -----
+ENABLE_MEMORY=true
+MEMORY_SHORT_TERM_WINDOW=20
+MEMORY_LONG_TERM_TOP_K=5
 
 # ----- 语言和地区 -----
 DEFAULT_LANGUAGE=zh-CN
@@ -825,6 +859,32 @@ agentforge/
 - [x] 模板市场
 - [x] 云端部署方案
 - [ ] 移动端适配
+
+### Phase 1 (改进计划): 数据持久化
+
+- [x] Alembic 数据库迁移（7张表）
+- [x] 对话与消息持久化
+- [x] LLM 调用后用量统计记录
+- [x] Auth、API Key、Agent 端点审计日志
+- [x] 应用启动时数据库初始化
+- [x] 事务管理修复（路由自主控制提交）
+- [x] 持久化层单元和集成测试
+- [x] 前端对话 CRUD API 客户端
+
+### Phase 2 (改进计划): 安全与生产化
+
+- [x] SlowAPI Rate Limiting 集成
+- [x] CORS 白名单替代通配符
+- [x] Provider 级别的 API Key 格式校验
+- [x] Usage/Plugin/Marketplace 路由鉴权
+- [x] Feature Flags（代码执行、网络搜索、文件操作）
+- [x] 完整记忆系统（短期滑动窗口 + ChromaDB 长期向量）
+- [x] Docker 多阶段构建 + Gunicorn 生产部署
+- [x] Docker Compose 全服务健康检查
+- [x] K8s Secret 安全加固
+- [x] 前端 Auth Token 拦截器 + 持久化聊天
+- [x] 6 个核心模块测试套件 + 共享 Fixtures
+- [x] DB 索引迁移优化
 
 ---
 

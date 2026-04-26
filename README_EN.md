@@ -64,7 +64,9 @@ English | [简体中文](./README.md)
 | **Multi-Agent Collaboration** | Supports single Agent and multi-Agent team collaboration modes |
 | **Web Interface** | Modern Web UI with real-time chat and workflow visualization |
 | **Tool Ecosystem** | Built-in search, code execution, file processing and more |
-| **One-click Deploy** | Docker support, launch complete services in 3 seconds |
+| **Memory System** | Short-term sliding window + ChromaDB long-term vector memory, cross-session recall |
+| **Security Hardened** | Rate limiting, CORS whitelist, API key format validation, route authentication |
+| **One-click Deploy** | Docker multi-stage builds, health checks, production-grade Gunicorn deployment |
 
 ---
 
@@ -102,15 +104,36 @@ English | [简体中文](./README.md)
 ### 3. Memory System
 
 ```
-Short-term Memory (Session)     Long-term Memory (Persistent)
-+-------------------------+     +-------------------------+
-| Current chat context    |     | Vector database storage  |
-| Auto management         | ->  | Cross-session memory     |
-| Window sliding trim     |     | Semantic retrieval       |
-+-------------------------+     +-------------------------+
+Short-term Memory (ShortTermMemory)     Long-term Memory (LongTermMemory)
++---------------------------+           +---------------------------+
+| Current chat context      |           | ChromaDB vector storage   |
+| Configurable sliding window|    ->   | Cross-session memory      |
+| Auto-trim old messages    |           | Semantic similarity search|
+| Query and clear support   |           | Auto embedding generation |
++---------------------------+           +---------------------------+
+                  |                                |
+                  v                                v
+         +-----------------------------------------------+
+         |        MemoryManager (Unified Facade)          |
+         |  - add() / search() / get_context()            |
+         |  - Toggle via ENABLE_MEMORY setting            |
+         |  - Configurable window size and top_k          |
+         +-----------------------------------------------+
 ```
 
-### 4. Multi-Model Support
+### 4. Security and Production Readiness
+
+| Feature | Description |
+|---------|-------------|
+| Rate Limiting | SlowAPI per-IP throttling, 30 req/min on tool execution by default |
+| CORS Whitelist | Configurable origins, no wildcard `*` in production |
+| API Key Validation | Provider-specific format validation (OpenAI/Anthropic/Google etc.) |
+| Route Authentication | Unified auth on Usage/Plugin/Marketplace routes |
+| Feature Flags | `ENABLE_CODE_EXECUTION`, `ENABLE_WEB_SEARCH`, `ENABLE_FILE_OPS` toggles |
+| Production Deploy | Gunicorn + Uvicorn Worker multi-process, multi-stage Docker builds |
+| Health Checks | Docker Compose service-level health checks, K8s ready |
+
+### 5. Multi-Model Support
 
 Unified interface through LiteLLM, supporting:
 
@@ -190,10 +213,13 @@ Backend Stack
 |-- Framework: FastAPI
 |-- Language: Python 3.10+
 |-- Async: asyncio + uvicorn
+|-- Production: Gunicorn + Uvicorn Workers
 |-- Validation: Pydantic v2
 |-- LLM: LiteLLM (unified interface)
 |-- Vector DB: ChromaDB
-+-- ORM: SQLAlchemy 2.0
+|-- ORM: SQLAlchemy 2.0
+|-- Rate Limiting: SlowAPI
++-- Testing: pytest + httpx
 
 Infrastructure
 |-- Containers: Docker + Docker Compose
@@ -312,10 +338,19 @@ EMBEDDING_MODEL=text-embedding-3-small
 SERPER_API_KEY=your-serper-api-key
 BING_API_KEY=your-bing-api-key
 
+# ----- Security Configuration -----
+CORS_ORIGINS=http://localhost:3000,http://localhost:8000
+RATE_LIMIT_PER_MINUTE=30
+
 # ----- Feature Toggles -----
 ENABLE_CODE_EXECUTION=true
 ENABLE_WEB_SEARCH=true
 ENABLE_FILE_OPS=true
+
+# ----- Memory System Configuration -----
+ENABLE_MEMORY=true
+MEMORY_SHORT_TERM_WINDOW=20
+MEMORY_LONG_TERM_TOP_K=5
 
 # ----- Language and Region -----
 DEFAULT_LANGUAGE=zh-CN
@@ -829,14 +864,29 @@ agentforge/
 
 ### Phase 1 (Improvement Plan): Data Persistence
 
-- [x] Alembic database migration setup (7 tables)
-- [x] Conversation and message persistence in chat router
+- [x] Alembic database migration (7 tables)
+- [x] Conversation and message persistence
 - [x] Usage statistics recording after LLM calls
 - [x] Audit log recording for auth, API key, and agent endpoints
 - [x] Database initialization on app startup
 - [x] Transaction management fix (routers control their own commits)
 - [x] Unit and integration tests for persistence layer
 - [x] Frontend API client for conversation CRUD operations
+
+### Phase 2 (Improvement Plan): Security and Production Hardening
+
+- [x] SlowAPI rate limiting integration
+- [x] CORS whitelist replacing wildcard
+- [x] Provider-level API key format validation
+- [x] Authentication on Usage/Plugin/Marketplace routes
+- [x] Feature flags (code execution, web search, file ops)
+- [x] Full memory system (short-term sliding window + ChromaDB long-term vectors)
+- [x] Docker multi-stage builds + Gunicorn production deployment
+- [x] Docker Compose service health checks
+- [x] K8s Secret security hardening
+- [x] Frontend auth token interceptors + persistent chat sessions
+- [x] 6 core module test suites + shared fixtures
+- [x] DB index migration optimization
 
 ---
 
